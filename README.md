@@ -61,7 +61,7 @@ The report leads with a correlation matrix (tool × Layer → finding count), th
 
 [`examples/cross_pluma/`](examples/cross_pluma/) is the canonical run: funnel-researcher + integration-watcher against the agentic-API fixture bundled at `fixtures/pluma_api/`. It surfaces 4 cross-tool findings — including the `agt_xxxxxxxx` quickstart placeholder, which appears as a dropoff hypothesis in funnel-researcher *and* a trace-pattern finding in integration-watcher, matched mechanically on `docs/quickstart.md:23-30` — plus 1 finding unique to integration-watcher. See [the example's README](examples/cross_pluma/README.md) for the breakdown and how to reproduce it for free from cache.
 
-The fixture is a snapshot of funnel-researcher's fictional API product, bundled here for self-contained reproducibility. See [funnel-researcher](https://github.com/ivaylogb/funnel-researcher) for the canonical version.
+The fixture and inputs are bundled here as a snapshot for self-contained reproducibility. The canonical fixture lives in [funnel-researcher](https://github.com/ivaylogb/funnel-researcher); the trace inputs in [integration-watcher](https://github.com/ivaylogb/integration-watcher).
 
 ## How it works
 
