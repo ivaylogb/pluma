@@ -1,0 +1,64 @@
+{
+  "_synthesis_note": "SYNTHESIZED quantitative signal for the Stripe Connect onboarding worked example. Numbers are illustrative, not measured. Each step count and failure signal is grounded in a public-signal friction pattern documented in PHASE_2_RESEARCH.md; the per-number rationale is in PHASE_2_NOTES.md. Shape mirrors funnel-researcher/examples/api_activation/dropoff_data.json (the schema the tool consumes).",
+  "cohort_name": "connect_platforms_onboarding_accounts_window_2026_04_15",
+  "cohort_size": 840,
+  "measurement_window_days": 30,
+  "step_counts": {
+    "account_created": 840,
+    "capabilities_requested": 812,
+    "persons_added": 690,
+    "requirements_collected": 612,
+    "requirements_satisfied": 388,
+    "charges_enabled": 331
+  },
+  "step_pass_rates": {
+    "account_created_to_capabilities_requested": 0.967,
+    "capabilities_requested_to_persons_added": 0.850,
+    "persons_added_to_requirements_collected": 0.887,
+    "requirements_collected_to_requirements_satisfied": 0.634,
+    "requirements_satisfied_to_charges_enabled": 0.853
+  },
+  "target_step_failure_signals": [
+    {
+      "signal": "Account.requirements.currently_due remains non-empty 7+ days after the last POST /v1/accounts/{account} submit; no further API calls from the integration (silent abandonment)",
+      "fraction_of_dropoffs": 0.34,
+      "step": "requirements_satisfied",
+      "median_developer_calls_before_quit": 3,
+      "grounded_in": "P1 — the silent requirements.currently_due gate (PHASE_2_RESEARCH.md C: Stripe Support KB 'payouts-or-charges-not-enabled'; D: future_requirements changelog; A: charges_enabled has zero stripe-python issues)"
+    },
+    {
+      "signal": "Requested capability stays status=inactive/pending with capability.requirements.currently_due populated; developer keeps polling GET /v1/accounts/{account}/capabilities/{capability} without submitting the new requirements",
+      "fraction_of_dropoffs": 0.22,
+      "step": "requirements_satisfied",
+      "median_developer_calls_before_quit": 4,
+      "grounded_in": "P2 — capabilities<->requirements coupling (changelog 'risk requirements added to Capabilities API'; account-capabilities doc; Support KB)"
+    },
+    {
+      "signal": "Account.requirements.disabled_reason == 'requirements.pending_verification'; integration stops listening for account.updated and never re-checks",
+      "fraction_of_dropoffs": 0.17,
+      "step": "requirements_satisfied",
+      "median_developer_calls_before_quit": 2,
+      "grounded_in": "P1 — async verification stall (handling-api-verification.md disabled_reason table; errors.md Layer 3a)"
+    },
+    {
+      "signal": "POST /v1/accounts/{account} returns 200 but Account.requirements.currently_due is unchanged (submitted under-specified or wrong fields, no error raised)",
+      "fraction_of_dropoffs": 0.14,
+      "step": "requirements_satisfied",
+      "median_developer_calls_before_quit": 5,
+      "grounded_in": "P4 + P1 — 200 without progress, error-to-next-action gap (GitHub #347; errors.md Layer 2)"
+    },
+    {
+      "signal": "Account.requirements.errors[] populated (e.g. invalid_address_city_state_postal_code, verification_document_failed_greyscale) and not resolved before the cohort window closes",
+      "fraction_of_dropoffs": 0.13,
+      "step": "requirements_satisfied",
+      "median_developer_calls_before_quit": 3,
+      "grounded_in": "P4 — validation/verification error codes not surfaced as next actions (handling-api-verification.md requirements.errors[]; errors.md Layer 3b)"
+    }
+  ],
+  "qualitative_signals": [
+    "stripe-python issue #1227 ('AttributeError: service_agreement', open, 20 comments): typed Account.tos_acceptance.service_agreement access crashes onboarding gating logic the type hints implied was safe — interface-layer friction adjacent to the requirements gate.",
+    "Stripe maintains dedicated Support KB articles for 'payouts or charges not enabled for connected accounts with platform-gathered verification requirements' and 'manage onboarding and risk requirements' — the friction is common enough to warrant standing documentation.",
+    "Stack Overflow's highest-signal stripe-connect onboarding questions are conceptual ('what's the difference between Customers and Accounts?'), not code bugs — the gate is upstream of code (context/measurement), consistent with charges_enabled producing zero stripe-python SDK issues.",
+    "Stripe changelog shows repeated breaking changes to the requirements/capabilities contract (future_requirements added, risk requirements added to the Capabilities API, requirements-collection parameters updated) — Stripe iterating on exactly the surface where this funnel's dropoff concentrates."
+  ]
+}
