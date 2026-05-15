@@ -11,10 +11,10 @@ You have a developer-API product that's leaking activation. You have funnel/drop
 ```bash
 pluma cross \
     --product fixtures/pluma_api \
-    --funnel  ../funnel-researcher/examples/api_activation/funnel.yaml \
-    --dropoff ../funnel-researcher/examples/api_activation/dropoff_data.json \
-    --traces  ../integration-watcher/examples/agent_platform/traces.jsonl \
-    --cohort  ../integration-watcher/examples/agent_platform/integration_cohort.yaml \
+    --funnel  examples/cross_pluma/inputs/funnel.yaml \
+    --dropoff examples/cross_pluma/inputs/dropoff_data.json \
+    --traces  examples/cross_pluma/inputs/traces.jsonl \
+    --cohort  examples/cross_pluma/inputs/integration_cohort.yaml \
     --output-file outputs/pluma_cross_example.md
 ```
 
@@ -56,7 +56,9 @@ The report leads with a correlation matrix (tool × Layer → finding count), th
 
 ## Worked example
 
-[`examples/cross_pluma/`](examples/cross_pluma/) is the canonical run: funnel-researcher + integration-watcher against the agentic-API fixture (`fixtures/pluma_api/`, a symlink into funnel-researcher's read-only fixture). It surfaces 4 cross-tool findings — including the `agt_xxxxxxxx` quickstart placeholder, which appears as a dropoff hypothesis in funnel-researcher *and* a trace-pattern finding in integration-watcher, matched mechanically on `docs/quickstart.md:23-30` — plus 1 finding unique to integration-watcher. See [the example's README](examples/cross_pluma/README.md) for the breakdown and how to reproduce it for free from cache.
+[`examples/cross_pluma/`](examples/cross_pluma/) is the canonical run: funnel-researcher + integration-watcher against the agentic-API fixture bundled at `fixtures/pluma_api/`. It surfaces 4 cross-tool findings — including the `agt_xxxxxxxx` quickstart placeholder, which appears as a dropoff hypothesis in funnel-researcher *and* a trace-pattern finding in integration-watcher, matched mechanically on `docs/quickstart.md:23-30` — plus 1 finding unique to integration-watcher. See [the example's README](examples/cross_pluma/README.md) for the breakdown and how to reproduce it for free from cache.
+
+The fixture is a snapshot of funnel-researcher's fictional API product, bundled here for self-contained reproducibility. See [funnel-researcher](https://github.com/ivaylogb/funnel-researcher) for the canonical version.
 
 ## How it works
 

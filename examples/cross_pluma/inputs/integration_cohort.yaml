@@ -1,0 +1,31 @@
+cohort_name: pluma_multi_step_agents_stall_at_5_runs
+date_range:
+  start: 2026-05-08
+  end:   2026-05-14
+developer_count: 5
+api_product: pluma
+
+watch_question: |
+  Developers building multi-step agents on Pluma seem to stall after their
+  5th successful run. Trace data shows successful agents.create + 3-5
+  successful agents.run calls, then a cluster of failures or silence. Why
+  are these integrations falling off cliff at the same point in the call
+  sequence, and what in the product surface (errors, SDK, docs, sequence)
+  is producing the pattern?
+
+scope:
+  endpoint_prefix: /agents
+  exclude_endpoints:
+    - /healthz
+    - /usage
+  exclude_developer_ids: []
+
+product_artifact_dir: fixtures/pluma_api/
+
+notes: |
+  Cohort is small (5 developers) and synthetic for the worked example.
+  Real cohorts at this stage of platform growth will typically be 20-200
+  active integrations. The findings methodology does not require a
+  particular cohort size — it requires per-integration trace sequences
+  long enough to expose the integration's call pattern (~30 calls each is
+  comfortable; fewer is OK if the failure mode shows up early).
