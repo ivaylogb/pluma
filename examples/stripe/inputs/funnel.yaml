@@ -1,0 +1,91 @@
+# Stripe Connect onboarding funnel — SYNTHESIZED, grounded in public signal.
+#
+# Product surface is real Stripe (examples/stripe/inputs/product/). This funnel
+# definition and the paired dropoff_data.json are synthesized for the worked
+# example; the friction they encode is grounded in observable public signal
+# documented in PHASE_2_RESEARCH.md (GitHub stripe-python issues, Stack
+# Overflow stripe-connect, Stripe Support KB, Stripe changelog). See
+# PHASE_2_NOTES.md for the per-number rationale.
+#
+# Shape mirrors funnel-researcher/examples/api_activation/funnel.yaml (the
+# schema the tool consumes): name / metric / target_dropoff_step / steps[]
+# with id, name, success_criterion, typical_duration. `description` is an
+# extra informational field for auditability.
+
+name: stripe_connect_onboarding
+metric: connected_accounts_reaching_charges_enabled
+
+# The step the diagnose run investigates. The dominant friction (pattern P1 —
+# the silent requirements.currently_due gate) bites hardest moving from
+# requirements_collected into requirements_satisfied, so that is the target.
+target_dropoff_step: requirements_satisfied
+
+steps:
+  - id: account_created
+    name: Connected account created
+    description: >-
+      Platform calls POST /v1/accounts and gets back an acct_ id. This nearly
+      always succeeds at the HTTP layer — which is itself the start of the
+      trap (pattern P1): a 200 here does not mean the account can charge.
+    success_criterion: POST /v1/accounts returns 200 with an account id
+    typical_duration: under 10 minutes
+
+  - id: capabilities_requested
+    name: Capabilities requested
+    description: >-
+      Platform requests capabilities (e.g. card_payments, transfers) on the
+      account. Pattern P2 lives here: requesting a capability silently
+      expands the requirement set, and the capability stays inactive/pending
+      until those requirements clear — a coupling most developers don't see.
+    success_criterion: >-
+      Account created with a non-empty capabilities request, or a subsequent
+      POST /v1/accounts/{account} that sets requested capabilities
+    typical_duration: under 30 minutes from account_created
+
+  - id: persons_added
+    name: Persons / representative submitted
+    description: >-
+      Platform submits the required Person(s) — representative, owners,
+      directors — via POST /v1/accounts/{account}/persons. Patterns P3 and P6
+      bite here: typed-model runtime mismatches on the Account/Person object
+      and Account-vs-Customer-vs-Person object confusion.
+    success_criterion: >-
+      At least the account representative submitted via
+      POST /v1/accounts/{account}/persons returning 200
+    typical_duration: under 2 hours from capabilities_requested
+
+  - id: requirements_collected
+    name: Currently-due requirements submitted
+    description: >-
+      Platform reads Account.requirements.currently_due and submits the
+      listed information back via POST /v1/accounts/{account}. Pattern P4
+      bites here: errors that describe the prohibition, not the fix, and
+      updates that return 200 without actually clearing currently_due.
+    success_criterion: >-
+      A POST /v1/accounts/{account} update submitting fields named in
+      requirements.currently_due, returning 200
+    typical_duration: under 1 day from persons_added
+
+  - id: requirements_satisfied
+    name: All currently-due requirements satisfied
+    description: >-
+      Account.requirements.currently_due is empty and disabled_reason is
+      null/cleared (no requirements.pending_verification stall, no
+      requirements.errors[]). This is the target step — pattern P1 (the
+      silent currently_due gate) and pattern P2 (capability coupling)
+      converge here and produce the largest dropoff.
+    success_criterion: >-
+      Account.requirements.currently_due == [] and
+      requirements.disabled_reason not in (requirements.past_due,
+      requirements.pending_verification, rejected.*)
+    typical_duration: under 3 days from requirements_collected
+
+  - id: charges_enabled
+    name: charges_enabled = true
+    description: >-
+      The activation goal. Account.charges_enabled is true and the requested
+      payments capability is active. Some accounts that satisfied
+      currently_due still stall here on asynchronous pending_verification or
+      risk-review disabled_reason.
+    success_criterion: Account.charges_enabled == true
+    typical_duration: within 7 days from requirements_satisfied

@@ -1,0 +1,37 @@
+cohort_name: stripe_connect_stall_before_charges_enabled
+date_range:
+  start: 2026-04-15
+  end:   2026-05-14
+developer_count: 7
+api_product: stripe_connect
+
+watch_question: |
+  Connect platform integrations create a connected account successfully
+  (POST /v1/accounts returns 200) but a large fraction never reach
+  charges_enabled. Trace data shows the account is created, then a scatter
+  of GETs on the account / capabilities, partial POSTs back, and then
+  failures or silence — without an HTTP error in many cases. Where are
+  integrations getting stuck between first account creation and
+  charges_enabled, and what in the product surface (errors, SDK, docs,
+  call sequence) is producing the pattern?
+
+scope:
+  endpoint_prefix: /v1/account
+  exclude_endpoints:
+    - /v1/accounts/{account}/external_accounts
+    - /v1/accounts/{account}/login_links
+  exclude_developer_ids: []
+
+product_artifact_dir: examples/stripe/inputs/product/
+
+notes: |
+  SYNTHESIZED cohort for the worked example. Developer ids use a
+  clearly-synthetic dev_xxxx format and are not Stripe account ids. The
+  7-integration cohort and ~150 calls are illustrative; the friction each
+  integration exhibits is grounded in public signal documented in
+  PHASE_2_RESEARCH.md, and the per-integration design rationale is in
+  PHASE_2_NOTES.md. Real cohorts at this stage are typically 20-200 active
+  Connect integrations; the findings methodology needs per-integration
+  sequences long enough to expose the call pattern, not a particular cohort
+  size. Endpoints used appear verbatim in inputs/product/openapi.yaml; every
+  error_code used appears verbatim in inputs/product/errors.md.
