@@ -1,8 +1,11 @@
 # pluma
 
-One CLI over three failure-diagnosis tools for developer-API products: [funnel-researcher](https://github.com/ivaylogb/funnel-researcher) (why developers drop off a funnel step), [agent-researcher](https://github.com/ivaylogb/agent-researcher) (why an agent fails an eval), and [integration-watcher](https://github.com/ivaylogb/integration-watcher) (what patterns show up in a cohort's integration traces). Pluma routes a single command to the right tool, caches runs so iteration is free, and — its reason to exist — runs two or more tools against the *same* product surface and reports where their findings overlap.
+One CLI over three failure-diagnosis tools for developer-API products:
+[funnel-researcher](https://github.com/ivaylogb/funnel-researcher) (why developers drop off a funnel step), 
+[agent-researcher](https://github.com/ivaylogb/agent-researcher) (why an agent fails an eval), 
+[integration-watcher](https://github.com/ivaylogb/integration-watcher) (what patterns show up in a cohort's integration traces). 
 
-Built for a growth/PLG PM who already runs these tools separately and wants the one question they can't answer today: *when the funnel data and the trace data and the eval data all point at the same product, do they point at the same defect?*
+Pluma routes a single command to the right tool, caches runs so iteration is free, and runs two or more tools against the *same* product surface and reports where their findings overlap.
 
 ## What it does
 
