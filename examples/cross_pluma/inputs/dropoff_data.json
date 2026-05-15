@@ -1,0 +1,59 @@
+{
+  "cohort_name": "developers_signed_up_week_of_2026_04_28",
+  "cohort_size": 1247,
+  "measurement_window_days": 30,
+  "step_counts": {
+    "signup": 1247,
+    "docs_landing": 1089,
+    "sdk_install": 743,
+    "first_api_call": 612,
+    "first_successful_agent_run": 287,
+    "ten_runs": 198,
+    "production_integration": 89
+  },
+  "step_pass_rates": {
+    "signup_to_docs_landing": 0.873,
+    "docs_landing_to_sdk_install": 0.683,
+    "sdk_install_to_first_api_call": 0.824,
+    "first_api_call_to_first_successful_agent_run": 0.469,
+    "first_successful_agent_run_to_ten_runs": 0.690,
+    "ten_runs_to_production_integration": 0.449
+  },
+  "target_step_failure_signals": [
+    {
+      "signal": "first call returns 400 with error code MISSING_AGENT_ID",
+      "fraction_of_dropoffs": 0.31,
+      "step": "first_successful_agent_run",
+      "median_developer_calls_before_quit": 4
+    },
+    {
+      "signal": "first call returns 401 with error code INVALID_AGENT_SCOPE",
+      "fraction_of_dropoffs": 0.18,
+      "step": "first_successful_agent_run",
+      "median_developer_calls_before_quit": 2
+    },
+    {
+      "signal": "run.start succeeds but no run.complete event within 5 minutes",
+      "fraction_of_dropoffs": 0.24,
+      "step": "first_successful_agent_run",
+      "median_developer_calls_before_quit": 1
+    },
+    {
+      "signal": "tool_call event with missing required parameter, no retry",
+      "fraction_of_dropoffs": 0.14,
+      "step": "first_successful_agent_run",
+      "median_developer_calls_before_quit": 3
+    },
+    {
+      "signal": "successful first_api_call but no agent run attempted within 24h",
+      "fraction_of_dropoffs": 0.13,
+      "step": "first_successful_agent_run",
+      "median_developer_calls_before_quit": 1
+    }
+  ],
+  "qualitative_signals": [
+    "Support tickets mentioning 'agent_id' increased 4x relative to previous endpoint launches in the same period.",
+    "GitHub issues on pluma-sdk-python tagged 'getting-started' tripled in the measurement window.",
+    "Developer survey free-text responses cluster around 'unclear what agent_id should be' and 'docs jump to advanced examples'."
+  ]
+}

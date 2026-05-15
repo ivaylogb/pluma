@@ -1,0 +1,56 @@
+# Example funnel definition for a fictional agentic API product.
+#
+# A funnel-researcher target funnel has:
+# - name: identifier for the funnel
+# - metric: what's being optimized (the outcome)
+# - target_dropoff_step: which step the diagnose run is investigating
+# - steps: ordered list of stages a developer moves through
+#
+# Each step has:
+# - id: short identifier referenced elsewhere
+# - name: human-readable description
+# - success_criterion: how we know the developer completed this step
+# - typical_duration: rough expectation for time-in-step (informational)
+
+name: pluma_api_activation
+metric: developers_reaching_first_production_call
+
+# The step under investigation. diagnose will explain why developers drop
+# off at THIS step specifically. Other steps are context, not the target.
+target_dropoff_step: first_successful_agent_run
+
+steps:
+  - id: signup
+    name: Developer signs up and receives API key
+    success_criterion: API key issued
+    typical_duration: under 5 minutes
+
+  - id: docs_landing
+    name: Developer reaches quickstart docs page
+    success_criterion: Page view recorded for /docs/quickstart
+    typical_duration: under 15 minutes
+
+  - id: sdk_install
+    name: Developer installs the SDK
+    success_criterion: SDK version check call (or first import telemetry) recorded
+    typical_duration: under 30 minutes
+
+  - id: first_api_call
+    name: Developer makes their first call (any endpoint)
+    success_criterion: At least one request received against the API key
+    typical_duration: under 1 hour from sdk_install
+
+  - id: first_successful_agent_run
+    name: Developer successfully completes an end-to-end agent run
+    success_criterion: A run reaches the `run.complete` event without unhandled error
+    typical_duration: under 4 hours from first_api_call
+
+  - id: ten_runs
+    name: Developer completes 10+ agent runs in their first week
+    success_criterion: 10 successful run.complete events from this API key
+    typical_duration: within 7 days
+
+  - id: production_integration
+    name: API key used from production hosts (non-localhost/non-CI IPs)
+    success_criterion: Calls from production IP ranges with traffic volume > local-testing baseline
+    typical_duration: within 30 days
