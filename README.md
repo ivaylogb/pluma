@@ -9,7 +9,8 @@ Pluma routes a single command to the right tool, caches runs so iteration is fre
 
 ## What it does
 
-You have a developer-API product that's leaking activation. You have funnel/dropoff data, you have integration traces from a cohort, maybe you have an agent eval. Each sister tool reads one of those plus the product's artifacts (docs, SDK source, error catalog) and produces evidence-grounded, `file:line`-cited findings. Pluma is the layer on top:
+You have a developer-API product that's leaking activation. You have funnel/dropoff data, you have integration traces from a cohort, maybe you have an agent eval. 
+Each sister tool reads one of those plus the product's artifacts (docs, SDK source, error catalog) and produces evidence-grounded, `file:line`-cited findings. 
 
 ```bash
 pluma cross \
@@ -35,7 +36,8 @@ That runs funnel-researcher and integration-watcher against the same fixture, no
 | `iterate` | the report's origin tool | apply every applyable finding, side-by-side |
 | `cross` | ≥2 tools | the cross-tool report |
 
-`apply`/`iterate` read the `Origin:` tag out of a Pluma report and dispatch to the tool that produced it — you don't restate which tool. They are mechanical (no model tokens); only `diagnose*`/`watch`/`cross` spend.
+`apply`/`iterate` read the `Origin:` tag out of a Pluma report and dispatch to the tool that produced it — you don't restate which tool. 
+They are mechanical (no model tokens); only `diagnose*`/`watch`/`cross` spend.
 
 ## Intent routing
 
@@ -50,7 +52,7 @@ That runs funnel-researcher and integration-watcher against the same fixture, no
 
 ## Cross-tool report
 
-The value-add. `pluma cross` needs inputs for at least two tools, all pointing at the same `--product`. It runs each applicable tool (through the cache), normalizes every output into a unified **Finding** shape, and detects overlap two ways:
+ `pluma cross` needs inputs for at least two tools, all pointing at the same `--product`. It runs each applicable tool (through the cache), normalizes every output into a unified **Finding** shape, and detects overlap two ways:
 
 - **Mechanical** — two findings cite the same `file:line` (ranges overlap).
 - **Categorical** — two findings share a Layer *and* a product surface (a cited file), without a line-level hit.
@@ -65,15 +67,14 @@ The fixture and inputs are bundled here as a snapshot for self-contained reprodu
 
 ## How it works
 
-Pluma imports the three sister tools as libraries and calls their Python API directly — no subprocess, no shelling out (agent-researcher still spawns its own eval subprocess internally; that's the tool's choice, not Pluma's). Each tool is installed from its GitHub repo (`pyproject.toml` pins them via `git+https`).
-
-Every generating run goes through an input-hash cache at `~/.pluma/cache/<tool>_<hash>.md`. The key covers file *contents* (not paths) and flag values: rename an input or move the working directory and the cache still hits; edit one byte of any input and it misses. `--force` re-runs on a hit; `--no-cache` bypasses entirely. This is what makes iterating on a `cross` report — or re-running after a normalizer change — cost $0.
+Pluma imports the three sister tools as libraries and calls their Python API directly. agent-researcher still spawns its own eval subprocess internally, each tool is installed from its GitHub repo (`pyproject.toml` pins them via `git+https`).
+Every generating run goes through an input-hash cache at `~/.pluma/cache/<tool>_<hash>.md`. The key covers file *contents* (not paths) and flag values: rename an input or move the working directory and the cache still hits; edit one byte of any input and it misses. `--force` re-runs on a hit; `--no-cache` bypasses entirely. This is what makes iterating on a `cross` report or re-running after a normalizer change cost $0.
 
 Each tool emits a slightly different report (funnel-/agent-researcher call them "Hypotheses", integration-watcher "Findings"; section names and metadata differ). `normalize.py` parses each into one shape: Pluma uses **Finding** everywhere, preserves the source term in an `Original entity term:` metadata line, lifts the `(Layer N)` annotation into a structured field, and extracts `file:line` citations for the cross-tool matcher.
 
 Pluma normalizes per-tool outputs into the agent-diagnosis-spec v0.1 Finding shape (see normalize.py for the parser; see [github.com/ivaylogb/agent-diagnosis-spec](https://github.com/ivaylogb/agent-diagnosis-spec) for the spec).
 
-Exit codes mirror the tools: `0` success, `2` missing input / routing ambiguity, `3` parse or upstream-API failure, `4` not applyable, `5` empty/all-errored iterate. agent-researcher's `apply` adds `6` (edit application failed), `7` (re-eval failed, edits left on disk), `8` (catastrophic) — Pluma propagates these unchanged.
+Exit codes mirror the tools: `0` success, `2` missing input / routing ambiguity, `3` parse or upstream-API failure, `4` not applyable, `5` empty/all-errored iterate. agent-researcher's `apply` adds `6` (edit application failed), `7` (re-eval failed, edits left on disk), `8` (catastrophic): Pluma propagates these unchanged.
 
 ## Install
 
