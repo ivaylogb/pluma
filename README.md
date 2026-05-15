@@ -71,6 +71,8 @@ Every generating run goes through an input-hash cache at `~/.pluma/cache/<tool>_
 
 Each tool emits a slightly different report (funnel-/agent-researcher call them "Hypotheses", integration-watcher "Findings"; section names and metadata differ). `normalize.py` parses each into one shape: Pluma uses **Finding** everywhere, preserves the source term in an `Original entity term:` metadata line, lifts the `(Layer N)` annotation into a structured field, and extracts `file:line` citations for the cross-tool matcher.
 
+Pluma normalizes per-tool outputs into the agent-diagnosis-spec v0.1 Finding shape (see normalize.py for the parser; see [github.com/ivaylogb/agent-diagnosis-spec](https://github.com/ivaylogb/agent-diagnosis-spec) for the spec).
+
 Exit codes mirror the tools: `0` success, `2` missing input / routing ambiguity, `3` parse or upstream-API failure, `4` not applyable, `5` empty/all-errored iterate. agent-researcher's `apply` adds `6` (edit application failed), `7` (re-eval failed, edits left on disk), `8` (catastrophic) — Pluma propagates these unchanged.
 
 ## Install
