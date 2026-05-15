@@ -1,6 +1,6 @@
 # Worked example: cross-tool report on the Pluma API fixture
 
-This runs funnel-researcher and integration-watcher against the *same* product surface — the fictional agentic-API product bundled at `fixtures/pluma_api/` — and reports where their findings overlap. The funnel inputs (`funnel.yaml`, `dropoff_data.json`) and trace inputs (`traces.jsonl`, `integration_cohort.yaml`) are bundled in `inputs/` alongside this README. Both lenses target the same product, which is the whole point: two independent diagnostic lenses, one surface.
+This runs funnel-researcher and integration-watcher against the *same* product surface — the sample API product bundled at `fixtures/pluma_api/` — and reports where their findings overlap. The funnel inputs (`funnel.yaml`, `dropoff_data.json`) and trace inputs (`traces.jsonl`, `integration_cohort.yaml`) are bundled in `inputs/` alongside this README. Both lenses target the same product, which is the whole point: two independent diagnostic lenses, one surface.
 
 The fixture and inputs are snapshots of funnel-researcher's `api_activation` example and integration-watcher's `agent_platform` example, copied here so this worked example is self-contained — clone Pluma and run it without the sister repos checked out alongside. See [funnel-researcher](https://github.com/ivaylogb/funnel-researcher) and [integration-watcher](https://github.com/ivaylogb/integration-watcher) for the canonical versions.
 
