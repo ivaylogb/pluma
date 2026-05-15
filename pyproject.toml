@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pluma"
+version = "0.1.0"
+description = "Orchestrator for agent-researcher, funnel-researcher, integration-watcher. One CLI, intent routing, cross-tool reports."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "pyyaml>=6.0",
+    "agent-researcher @ git+https://github.com/ivaylogb/agent-researcher.git",
+    "funnel-researcher @ git+https://github.com/ivaylogb/funnel-researcher.git",
+    "integration-watcher @ git+https://github.com/ivaylogb/integration-watcher.git",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+pluma = "pluma.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
