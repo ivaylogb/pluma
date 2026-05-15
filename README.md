@@ -76,6 +76,10 @@ Pluma normalizes per-tool outputs into the agent-diagnosis-spec v0.1 Finding sha
 
 Exit codes mirror the tools: `0` success, `2` missing input / routing ambiguity, `3` parse or upstream-API failure, `4` not applyable, `5` empty/all-errored iterate. agent-researcher's `apply` adds `6` (edit application failed), `7` (re-eval failed, edits left on disk), `8` (catastrophic): Pluma propagates these unchanged.
 
+## Integrations
+
+`src/pluma/integrations/` bridges external data-layer platforms into the sister tools' input shapes — see [`posthog/`](src/pluma/integrations/posthog/README.md) for a PostHog event export → integration-watcher trace converter.
+
 ## Install
 
 ```bash
