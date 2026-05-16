@@ -3,5 +3,10 @@ __pycache__/
 .pytest_cache/
 .pluma/cache/
 outputs/
+# Worked-example outputs are canonical, committed artifacts (the README
+# documents them as the run's audit trail). Carve them out of the blanket
+# outputs/ ignore above; tool-run scratch dirs stay ignored.
+!examples/*/outputs/
+!examples/*/outputs/**
 *.egg-info/
 .DS_Store
