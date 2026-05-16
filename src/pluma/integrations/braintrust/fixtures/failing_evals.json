@@ -1,0 +1,373 @@
+{
+  "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "experiment_name": "routing_classifier_eval_v3",
+  "project_name": "support-router",
+  "total": 36,
+  "passed": 25,
+  "pass_rate": 0.6944,
+  "threshold": 1.0,
+  "meets_threshold": false,
+  "results": [
+    {
+      "id": "a1c0e003-0b36-4f1a-9c36-000000000003",
+      "span_id": "span-0003",
+      "input": {
+        "message": "I was billed for a seat I removed last week.",
+        "channel": "email"
+      },
+      "expected": "billing",
+      "output": "account_management",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.74
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e003-0b36-4f1a-9c36-000000000003"
+      },
+      "created": "2026-05-14T09:03:00.000Z",
+      "scenario_id": "a1c0e003-0b36-4f1a-9c36-000000000003",
+      "predicted": "account_management",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='billing' output='account_management'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e003-0b36-4f1a-9c36-000000000003."
+    },
+    {
+      "id": "a1c0e007-0b36-4f1a-9c36-000000000007",
+      "span_id": "span-0007",
+      "input": {
+        "message": "Stop everything, I'm closing the account today.",
+        "channel": "phone"
+      },
+      "expected": "cancellation",
+      "output": "technical_support",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.66
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic",
+          "churn-risk"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e007-0b36-4f1a-9c36-000000000007"
+      },
+      "created": "2026-05-14T09:07:00.000Z",
+      "scenario_id": "a1c0e007-0b36-4f1a-9c36-000000000007",
+      "predicted": "technical_support",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='cancellation' output='technical_support'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e007-0b36-4f1a-9c36-000000000007."
+    },
+    {
+      "id": "a1c0e011-0b36-4f1a-9c36-000000000011",
+      "span_id": "span-0011",
+      "input": {
+        "message": "We're evaluating tools — what makes you different?",
+        "channel": "email"
+      },
+      "expected": "sales",
+      "output": "general_inquiry",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.58
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic",
+          "high-value"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e011-0b36-4f1a-9c36-000000000011"
+      },
+      "created": "2026-05-14T09:11:00.000Z",
+      "scenario_id": "a1c0e011-0b36-4f1a-9c36-000000000011",
+      "predicted": "general_inquiry",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='sales' output='general_inquiry'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e011-0b36-4f1a-9c36-000000000011."
+    },
+    {
+      "id": "a1c0e014-0b36-4f1a-9c36-000000000014",
+      "span_id": "span-0014",
+      "input": {
+        "message": "Charts show wrong totals after the latest update.",
+        "channel": "chat"
+      },
+      "expected": "technical_support",
+      "output": "billing",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.71
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e014-0b36-4f1a-9c36-000000000014"
+      },
+      "created": "2026-05-14T09:14:00.000Z",
+      "scenario_id": "a1c0e014-0b36-4f1a-9c36-000000000014",
+      "predicted": "billing",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='technical_support' output='billing'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e014-0b36-4f1a-9c36-000000000014."
+    },
+    {
+      "id": "a1c0e018-0b36-4f1a-9c36-000000000018",
+      "span_id": "span-0018",
+      "input": {
+        "message": "Remove the old admin who left the company.",
+        "channel": "email"
+      },
+      "expected": "account_management",
+      "output": "billing",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.69
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e018-0b36-4f1a-9c36-000000000018"
+      },
+      "created": "2026-05-14T09:18:00.000Z",
+      "scenario_id": "a1c0e018-0b36-4f1a-9c36-000000000018",
+      "predicted": "billing",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='account_management' output='billing'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e018-0b36-4f1a-9c36-000000000018."
+    },
+    {
+      "id": "a1c0e021-0b36-4f1a-9c36-000000000021",
+      "span_id": "span-0021",
+      "input": {
+        "message": "Do you accept ACH for annual invoices?",
+        "channel": "email"
+      },
+      "expected": "billing",
+      "output": "general_inquiry",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.62
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e021-0b36-4f1a-9c36-000000000021"
+      },
+      "created": "2026-05-14T09:21:00.000Z",
+      "scenario_id": "a1c0e021-0b36-4f1a-9c36-000000000021",
+      "predicted": "general_inquiry",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='billing' output='general_inquiry'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e021-0b36-4f1a-9c36-000000000021."
+    },
+    {
+      "id": "a1c0e025-0b36-4f1a-9c36-000000000025",
+      "span_id": "span-0025",
+      "input": {
+        "message": "We won't be renewing; wind down our workspace.",
+        "channel": "email"
+      },
+      "expected": "cancellation",
+      "output": "account_management",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.55
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic",
+          "churn-risk"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e025-0b36-4f1a-9c36-000000000025"
+      },
+      "created": "2026-05-14T09:25:00.000Z",
+      "scenario_id": "a1c0e025-0b36-4f1a-9c36-000000000025",
+      "predicted": "account_management",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='cancellation' output='account_management'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e025-0b36-4f1a-9c36-000000000025."
+    },
+    {
+      "id": "a1c0e028-0b36-4f1a-9c36-000000000028",
+      "span_id": "span-0028",
+      "input": {
+        "message": "Mobile app crashes on the reports tab.",
+        "channel": "chat"
+      },
+      "expected": "technical_support",
+      "output": "general_inquiry",
+      "scores": {
+        "exact_match": 0.0
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e028-0b36-4f1a-9c36-000000000028"
+      },
+      "created": "2026-05-14T09:28:00.000Z",
+      "scenario_id": "a1c0e028-0b36-4f1a-9c36-000000000028",
+      "predicted": "general_inquiry",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='technical_support' output='general_inquiry'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e028-0b36-4f1a-9c36-000000000028."
+    },
+    {
+      "id": "a1c0e031-0b36-4f1a-9c36-000000000031",
+      "span_id": "span-0031",
+      "input": {
+        "message": "Quote us for 200 seats with annual terms.",
+        "channel": "email"
+      },
+      "expected": "sales",
+      "output": "billing",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.7
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic",
+          "high-value"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e031-0b36-4f1a-9c36-000000000031"
+      },
+      "created": "2026-05-14T09:31:00.000Z",
+      "scenario_id": "a1c0e031-0b36-4f1a-9c36-000000000031",
+      "predicted": "billing",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='sales' output='billing'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e031-0b36-4f1a-9c36-000000000031."
+    },
+    {
+      "id": "a1c0e034-0b36-4f1a-9c36-000000000034",
+      "span_id": "span-0034",
+      "input": {
+        "message": "Is the API rate limit documented anywhere?",
+        "channel": "chat"
+      },
+      "expected": "general_inquiry",
+      "output": "technical_support",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.64
+      },
+      "created": "2026-05-14T09:34:00.000Z",
+      "scenario_id": "a1c0e034-0b36-4f1a-9c36-000000000034",
+      "predicted": "technical_support",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='general_inquiry' output='technical_support'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e034-0b36-4f1a-9c36-000000000034.",
+      "metadata": {
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e034-0b36-4f1a-9c36-000000000034"
+      }
+    },
+    {
+      "id": "a1c0e036-0b36-4f1a-9c36-000000000036",
+      "span_id": "span-0036",
+      "input": {
+        "message": "Merge my two team accounts into one.",
+        "channel": "email"
+      },
+      "expected": "account_management",
+      "output": "cancellation",
+      "scores": {
+        "exact_match": 0.0,
+        "calibrated_confidence": 0.52
+      },
+      "metadata": {
+        "model": "gpt-4o-mini",
+        "prompt_version": "v3",
+        "tags": [
+          "prod-traffic"
+        ],
+        "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "experiment_name": "routing_classifier_eval_v3",
+        "project_name": "support-router",
+        "row_id": "a1c0e036-0b36-4f1a-9c36-000000000036"
+      },
+      "created": "2026-05-14T09:36:00.000Z",
+      "scenario_id": "a1c0e036-0b36-4f1a-9c36-000000000036",
+      "predicted": "cancellation",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "exact_match",
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='account_management' output='cancellation'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e036-0b36-4f1a-9c36-000000000036."
+    }
+  ]
+}
