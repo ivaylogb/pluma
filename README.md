@@ -24,6 +24,12 @@ pluma cross \
 
 That runs funnel-researcher and integration-watcher against the same fixture, normalizes both reports, and emits one report with a correlation matrix, the findings that show up in *both* tools, and the findings unique to each.
 
+## Worked examples
+
+- **[examples/cross_pluma/](examples/cross_pluma/)** — fictional fixture demonstrating the cross-tool report. Use this to see how Pluma's machinery composes; the example's README walks the 4 cross-tool findings and how to reproduce them from cache.
+
+- **[examples/stripe/](examples/stripe/)** — Stripe Connect onboarding diagnosed against the real product surface (real docs, real SDK source) with public-signal-grounded synthetic cohort data. Two diagnostic lenses converging on the silent-200 gate. The credibility test of the methodology on a real production system.
+
 ## Subcommands
 
 | Subcommand | Routes to | Purpose |
@@ -59,12 +65,6 @@ They are mechanical (no model tokens); only `diagnose*`/`watch`/`cross` spend.
 
 The report leads with a correlation matrix (tool × Layer → finding count), then a *Cross-tool findings* section (every overlap, both findings' full bodies, the match reason), then *Findings unique to <tool>* — one section per tool. Mechanical matches win over categorical when both apply.
 
-## Worked example
-
-[`examples/cross_pluma/`](examples/cross_pluma/) is the canonical run: funnel-researcher + integration-watcher against the agentic-API fixture bundled at `fixtures/pluma_api/`. It surfaces 4 cross-tool findings — including the `agt_xxxxxxxx` quickstart placeholder, which appears as a dropoff hypothesis in funnel-researcher *and* a trace-pattern finding in integration-watcher, matched mechanically on `docs/quickstart.md:23-30` — plus 1 finding unique to integration-watcher. See [the example's README](examples/cross_pluma/README.md) for the breakdown and how to reproduce it for free from cache.
-
-The fixture and inputs are bundled here as a snapshot for self-contained reproducibility. The canonical fixture lives in [funnel-researcher](https://github.com/ivaylogb/funnel-researcher); the trace inputs in [integration-watcher](https://github.com/ivaylogb/integration-watcher).
-
 ## How it works
 
 Pluma imports the three sister tools as libraries and calls their Python API directly. agent-researcher still spawns its own eval subprocess internally, each tool is installed from its GitHub repo (`pyproject.toml` pins them via `git+https`).
@@ -78,7 +78,9 @@ Exit codes mirror the tools: `0` success, `2` missing input / routing ambiguity,
 
 ## Integrations
 
-`src/pluma/integrations/` bridges external data-layer platforms into the sister tools' input shapes — see [`posthog/`](src/pluma/integrations/posthog/README.md) for a PostHog event export → integration-watcher trace converter.
+Connect Pluma to existing analytics platforms and data sources.
+
+- **[PostHog](src/pluma/integrations/posthog/)** — convert PostHog event exports into integration-watcher trace input. Field-mapping documented, deterministic converter, golden fixture for diff testing. Roadmap covers a live API client, funnel converter, and writing Pluma findings back as PostHog annotations.
 
 ## Install
 
