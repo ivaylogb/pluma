@@ -1,21 +1,20 @@
 ## Pluma + PostHog integration
 
-This directory bridges PostHog (product analytics) with Pluma's diagnostic
-methodology. PostHog produces the data layer — what happened: funnel
-dropoffs, event streams, cohorts. Pluma produces the diagnosis layer —
+This directory bridges [PostHog](https://posthog.com/) (product analytics) with Pluma's diagnostic
+methodology. PostHog produces the data layer: funnel
+dropoffs, event streams, cohorts. Pluma runs as the diagnosis layer:
 where in the product surface to look, what byte-exact edit would change it.
 The shapes line up; the integration moves data between them.
 
 ## What's here today
 
-`events_to_traces.py` — a converter that transforms PostHog event exports
-(the shape returned by `GET /api/projects/:id/events`) into
-integration-watcher's trace JSONL format. Read a PostHog event export JSON,
+`events_to_traces.py` is a converter that transforms PostHog event exports
+(the shape returned by `GET /api/projects/:id/events`) into integration-watcher's trace JSONL format. Read a PostHog event export JSON,
 write a Pluma-ready `traces.jsonl`, point integration-watcher at it.
 `cli.py` is a thin argparse wrapper. The fixture and golden output live in
 `fixtures/`.
 
-### Assumed PostHog shape
+### PostHog format
 
 Each event carries `id`, `event`, `timestamp` (ISO 8601), `distinct_id`,
 and a `properties` object. For API-call events the request/response detail
@@ -68,7 +67,7 @@ pluma watch \
     --output-file findings.md
 ```
 
-## What's coming
+## Coming soon
 
 1. **Live PostHog API client.** The current converter reads a captured
    JSON file. Next: pull events directly from the PostHog API given a
@@ -93,12 +92,10 @@ pluma watch \
 
 ## Notes on the fixture
 
-`fixtures/events.json` is hand-authored to match the documented PostHog API
-response shape, not captured from a live PostHog instance. It models a
-generic REST API integration cohort — four developers authenticating,
+`fixtures/events.json` currently models a generic REST API integration cohort for authenticating, 
 listing and creating resources, and hitting auth, validation, rate-limit,
 and server errors along the way. `fixtures/traces.jsonl` is the committed
 golden output of running the converter against it; a diff against a fresh
 run is the regression test for the converter. When the live API client
-(item 1) ships, the fixture will be replaced with real captured data, or
+(item 1) ships here, the fixture will be replaced with real captured data, or
 supplemented with both.
