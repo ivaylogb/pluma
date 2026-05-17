@@ -1,0 +1,136 @@
+[
+  {
+    "traceId": "d55aeec5ee29716422b0abc31e2316cc",
+    "spanId": "c100cb856591bc76",
+    "name": "POST /v1/auth/token",
+    "kind": 3,
+    "startTimeUnixNano": 1778835600000000000,
+    "endTimeUnixNano": 1778835600170000000,
+    "attributes": {
+      "enduser.id": "dev_india",
+      "http.request.method": "POST",
+      "url.path": "/v1/auth/token",
+      "url.full": "https://api.acme-dev.example.com/v1/auth/token",
+      "http.route": "/v1/auth/token",
+      "http.response.status_code": 200,
+      "http.request.header.content-type": "application/json"
+    }
+  },
+  {
+    "traceId": "d55aeec5ee29716422b0abc31e2316cc",
+    "spanId": "a9d737378dc78c24",
+    "name": "GET /v1/projects",
+    "kind": 3,
+    "startTimeUnixNano": 1778835603170000000,
+    "endTimeUnixNano": 1778835603260000000,
+    "attributes": {
+      "enduser.id": "dev_india",
+      "http.request.method": "GET",
+      "url.path": "/v1/projects",
+      "url.full": "https://api.acme-dev.example.com/v1/projects",
+      "http.route": "/v1/projects",
+      "http.response.status_code": 200
+    }
+  },
+  {
+    "traceId": "d55aeec5ee29716422b0abc31e2316cc",
+    "spanId": "bf1efdba4b3ba6d0",
+    "name": "GET /v1/projects/proj_9d/items",
+    "kind": 3,
+    "startTimeUnixNano": 1778835606260000000,
+    "endTimeUnixNano": 1778835606320000000,
+    "attributes": {
+      "enduser.id": "dev_india",
+      "http.request.method": "GET",
+      "url.path": "/v1/projects/proj_9d/items",
+      "url.full": "https://api.acme-dev.example.com/v1/projects/proj_9d/items",
+      "http.route": "/v1/projects/proj_9d/items",
+      "http.response.status_code": 403,
+      "error.type": "403"
+    }
+  },
+  {
+    "traceId": "d55aeec5ee29716422b0abc31e2316cc",
+    "spanId": "374dd24636320461",
+    "name": "GET /v1/projects/proj_9d/items",
+    "kind": 3,
+    "startTimeUnixNano": 1778835609320000000,
+    "endTimeUnixNano": 1778835609378000000,
+    "attributes": {
+      "enduser.id": "dev_india",
+      "http.request.method": "GET",
+      "url.path": "/v1/projects/proj_9d/items",
+      "url.full": "https://api.acme-dev.example.com/v1/projects/proj_9d/items",
+      "http.route": "/v1/projects/proj_9d/items",
+      "http.response.status_code": 403,
+      "error.type": "403"
+    }
+  },
+  {
+    "traceId": "d55aeec5ee29716422b0abc31e2316cc",
+    "spanId": "72a78c77f6b035d5",
+    "name": "GET /v1/projects/proj_9d/items",
+    "kind": 3,
+    "startTimeUnixNano": 1778835612378000000,
+    "endTimeUnixNano": 1778835612439000000,
+    "attributes": {
+      "enduser.id": "dev_india",
+      "http.request.method": "GET",
+      "url.path": "/v1/projects/proj_9d/items",
+      "url.full": "https://api.acme-dev.example.com/v1/projects/proj_9d/items",
+      "http.route": "/v1/projects/proj_9d/items",
+      "http.response.status_code": 403,
+      "error.type": "403"
+    }
+  },
+  {
+    "traceId": "e62e3181aaf1dc811a004048d308ccf3",
+    "spanId": "8ad90f9b7401709c",
+    "name": "POST /v1/auth/token",
+    "kind": 3,
+    "startTimeUnixNano": 1778835615439000000,
+    "endTimeUnixNano": 1778835615607000000,
+    "attributes": {
+      "enduser.id": "dev_juliet",
+      "http.request.method": "POST",
+      "url.path": "/v1/auth/token",
+      "url.full": "https://api.acme-dev.example.com/v1/auth/token",
+      "http.route": "/v1/auth/token",
+      "http.response.status_code": 200,
+      "http.request.header.content-type": "application/json"
+    }
+  },
+  {
+    "traceId": "e62e3181aaf1dc811a004048d308ccf3",
+    "spanId": "f2be25c5bc18e609",
+    "name": "PUT /v1/projects/proj_1f",
+    "kind": 3,
+    "startTimeUnixNano": 1778835618607000000,
+    "endTimeUnixNano": 1778835618847000000,
+    "attributes": {
+      "enduser.id": "dev_juliet",
+      "http.request.method": "PUT",
+      "url.path": "/v1/projects/proj_1f",
+      "url.full": "https://api.acme-dev.example.com/v1/projects/proj_1f",
+      "http.route": "/v1/projects/proj_1f",
+      "http.response.status_code": 200,
+      "http.request.header.content-type": "application/json"
+    }
+  },
+  {
+    "traceId": "e62e3181aaf1dc811a004048d308ccf3",
+    "spanId": "1920de1478554f64",
+    "name": "GET /v1/projects/proj_1f",
+    "kind": 3,
+    "startTimeUnixNano": 1778835621847000000,
+    "endTimeUnixNano": 1778835621922000000,
+    "attributes": {
+      "enduser.id": "dev_juliet",
+      "http.request.method": "GET",
+      "url.path": "/v1/projects/proj_1f",
+      "url.full": "https://api.acme-dev.example.com/v1/projects/proj_1f",
+      "http.route": "/v1/projects/proj_1f",
+      "http.response.status_code": 200
+    }
+  }
+]

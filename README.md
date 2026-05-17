@@ -82,6 +82,8 @@ Connect Pluma to existing analytics platforms and data sources.
 
 - **[PostHog](src/pluma/integrations/posthog/)** — convert PostHog event exports into integration-watcher trace input. Field-mapping documented, deterministic converter, golden fixture for diff testing. Roadmap covers a live API client, funnel converter, and writing Pluma findings back as PostHog annotations.
 
+- **[OpenTelemetry](src/pluma/integrations/otel/)** — convert OpenTelemetry trace exports (OTLP/JSON, Jaeger, bare span arrays) into integration-watcher trace input. Format auto-detected; pre-1.21 and post-1.21 HTTP semantic-convention attribute names both handled. One adapter covers anything that exports OTel — Datadog, Honeycomb, Tempo, Jaeger, Grafana Cloud, X-Ray, Lightstep, Splunk. Field-mapping documented, deterministic converter, golden fixture for diff testing.
+
 - **[Braintrust](src/pluma/integrations/braintrust/)** — convert Braintrust experiment exports into agent-researcher failing-eval input. Field-mapping documented, deterministic converter, golden fixture for diff testing. Filters by primary scorer threshold; preserves the full Braintrust row for diagnostic context. A Braintrust experiment can also be diagnosed directly: `pluma diagnose-agent --target-agent <dir> --braintrust-experiment-id <id> --output-file <md>` (or `--braintrust-project <name> --latest`) pulls it live via the API, converts it, and runs agent-researcher in one command.
 
 ## Install

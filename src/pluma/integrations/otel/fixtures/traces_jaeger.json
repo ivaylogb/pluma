@@ -1,0 +1,317 @@
+{
+  "data": [
+    {
+      "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+      "spans": [
+        {
+          "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+          "spanID": "c7a51c8de8274087",
+          "operationName": "POST /v1/auth/token",
+          "references": [],
+          "startTime": 1778835600000000,
+          "duration": 165000,
+          "tags": [
+            {
+              "key": "enduser.id",
+              "type": "string",
+              "value": "dev_hotel"
+            },
+            {
+              "key": "http.method",
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "key": "http.target",
+              "type": "string",
+              "value": "/v1/auth/token"
+            },
+            {
+              "key": "http.url",
+              "type": "string",
+              "value": "https://api.acme-dev.example.com/v1/auth/token"
+            },
+            {
+              "key": "http.status_code",
+              "type": "int64",
+              "value": 200
+            },
+            {
+              "key": "http.request.mime_type",
+              "type": "string",
+              "value": "application/json"
+            }
+          ],
+          "processID": "p1"
+        },
+        {
+          "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+          "spanID": "de68e693d040e07d",
+          "operationName": "POST /v1/exports",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+              "spanID": "c7a51c8de8274087"
+            }
+          ],
+          "startTime": 1778835603165000,
+          "duration": 45000,
+          "tags": [
+            {
+              "key": "enduser.id",
+              "type": "string",
+              "value": "dev_hotel"
+            },
+            {
+              "key": "http.method",
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "key": "http.target",
+              "type": "string",
+              "value": "/v1/exports"
+            },
+            {
+              "key": "http.url",
+              "type": "string",
+              "value": "https://api.acme-dev.example.com/v1/exports"
+            },
+            {
+              "key": "http.status_code",
+              "type": "int64",
+              "value": 429
+            },
+            {
+              "key": "http.request.mime_type",
+              "type": "string",
+              "value": "application/json"
+            },
+            {
+              "key": "exception.type",
+              "type": "string",
+              "value": "429"
+            }
+          ],
+          "processID": "p1"
+        },
+        {
+          "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+          "spanID": "1d694e5686c391e8",
+          "operationName": "POST /v1/exports",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+              "spanID": "c7a51c8de8274087"
+            }
+          ],
+          "startTime": 1778835606210000,
+          "duration": 120000,
+          "tags": [
+            {
+              "key": "enduser.id",
+              "type": "string",
+              "value": "dev_hotel"
+            },
+            {
+              "key": "http.method",
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "key": "http.target",
+              "type": "string",
+              "value": "/v1/exports"
+            },
+            {
+              "key": "http.url",
+              "type": "string",
+              "value": "https://api.acme-dev.example.com/v1/exports"
+            },
+            {
+              "key": "http.status_code",
+              "type": "int64",
+              "value": 429
+            },
+            {
+              "key": "http.request.mime_type",
+              "type": "string",
+              "value": "application/json"
+            },
+            {
+              "key": "exception.type",
+              "type": "string",
+              "value": "429"
+            }
+          ],
+          "processID": "p1"
+        },
+        {
+          "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+          "spanID": "f1fe1101193cb466",
+          "operationName": "POST /v1/exports",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+              "spanID": "c7a51c8de8274087"
+            }
+          ],
+          "startTime": 1778835609330000,
+          "duration": 260000,
+          "tags": [
+            {
+              "key": "enduser.id",
+              "type": "string",
+              "value": "dev_hotel"
+            },
+            {
+              "key": "http.method",
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "key": "http.target",
+              "type": "string",
+              "value": "/v1/exports"
+            },
+            {
+              "key": "http.url",
+              "type": "string",
+              "value": "https://api.acme-dev.example.com/v1/exports"
+            },
+            {
+              "key": "http.status_code",
+              "type": "int64",
+              "value": 429
+            },
+            {
+              "key": "http.request.mime_type",
+              "type": "string",
+              "value": "application/json"
+            },
+            {
+              "key": "exception.type",
+              "type": "string",
+              "value": "429"
+            }
+          ],
+          "processID": "p1"
+        },
+        {
+          "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+          "spanID": "a4f301483c60a888",
+          "operationName": "POST /v1/exports",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+              "spanID": "c7a51c8de8274087"
+            }
+          ],
+          "startTime": 1778835612590000,
+          "duration": 510000,
+          "tags": [
+            {
+              "key": "enduser.id",
+              "type": "string",
+              "value": "dev_hotel"
+            },
+            {
+              "key": "http.method",
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "key": "http.target",
+              "type": "string",
+              "value": "/v1/exports"
+            },
+            {
+              "key": "http.url",
+              "type": "string",
+              "value": "https://api.acme-dev.example.com/v1/exports"
+            },
+            {
+              "key": "http.status_code",
+              "type": "int64",
+              "value": 429
+            },
+            {
+              "key": "http.request.mime_type",
+              "type": "string",
+              "value": "application/json"
+            },
+            {
+              "key": "exception.type",
+              "type": "string",
+              "value": "429"
+            }
+          ],
+          "processID": "p1"
+        },
+        {
+          "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+          "spanID": "5beb30a663ea76c0",
+          "operationName": "POST /v1/exports",
+          "references": [
+            {
+              "refType": "CHILD_OF",
+              "traceID": "468bbc224703be4948cab7f8ad3ee6d6",
+              "spanID": "c7a51c8de8274087"
+            }
+          ],
+          "startTime": 1778835616100000,
+          "duration": 300000,
+          "tags": [
+            {
+              "key": "enduser.id",
+              "type": "string",
+              "value": "dev_hotel"
+            },
+            {
+              "key": "http.method",
+              "type": "string",
+              "value": "POST"
+            },
+            {
+              "key": "http.target",
+              "type": "string",
+              "value": "/v1/exports"
+            },
+            {
+              "key": "http.url",
+              "type": "string",
+              "value": "https://api.acme-dev.example.com/v1/exports"
+            },
+            {
+              "key": "http.status_code",
+              "type": "int64",
+              "value": 200
+            },
+            {
+              "key": "http.request.mime_type",
+              "type": "string",
+              "value": "application/json"
+            }
+          ],
+          "processID": "p1"
+        }
+      ],
+      "processes": {
+        "p1": {
+          "serviceName": "acme-api-client",
+          "tags": [
+            {
+              "key": "service.namespace",
+              "type": "string",
+              "value": "acme-prod"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

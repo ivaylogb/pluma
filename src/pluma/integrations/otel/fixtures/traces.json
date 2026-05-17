@@ -1,0 +1,2791 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "acme-api-client"
+            }
+          },
+          {
+            "key": "service.namespace",
+            "value": {
+              "stringValue": "acme-prod"
+            }
+          },
+          {
+            "key": "telemetry.sdk.name",
+            "value": {
+              "stringValue": "opentelemetry"
+            }
+          },
+          {
+            "key": "telemetry.sdk.language",
+            "value": {
+              "stringValue": "python"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "opentelemetry.instrumentation.requests",
+            "version": "0.48b0"
+          },
+          "spans": [
+            {
+              "traceId": "0a15eefc9735568252186663963df4f9",
+              "spanId": "294cf3baabc904c8",
+              "name": "integration.session dev_alpha",
+              "kind": 1,
+              "startTimeUnixNano": "1778835600000000000",
+              "endTimeUnixNano": "1778835602000000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_alpha"
+                  }
+                },
+                {
+                  "key": "session.kind",
+                  "value": {
+                    "stringValue": "developer-integration"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "0a15eefc9735568252186663963df4f9",
+              "spanId": "9abcff99b20ad96d",
+              "parentSpanId": "294cf3baabc904c8",
+              "name": "SELECT api_key",
+              "kind": 3,
+              "startTimeUnixNano": "1778835600001000000",
+              "endTimeUnixNano": "1778835600004000000",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "SELECT id FROM api_key WHERE token=$1"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "0a15eefc9735568252186663963df4f9",
+              "spanId": "eb750bb324d92f0d",
+              "parentSpanId": "294cf3baabc904c8",
+              "name": "POST /v1/auth/token",
+              "kind": 3,
+              "startTimeUnixNano": "1778835600000000000",
+              "endTimeUnixNano": "1778835600180000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_alpha"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "0a15eefc9735568252186663963df4f9",
+              "spanId": "52c2c51ea951a2b0",
+              "parentSpanId": "294cf3baabc904c8",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835603180000000",
+              "endTimeUnixNano": "1778835603275000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_alpha"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "0a15eefc9735568252186663963df4f9",
+              "spanId": "12106cd7854b961a",
+              "parentSpanId": "294cf3baabc904c8",
+              "name": "POST /v1/projects/proj_4a/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835606275000000",
+              "endTimeUnixNano": "1778835606495000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_alpha"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_4a/items"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_4a/items"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_4a/items"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 201
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "0a15eefc9735568252186663963df4f9",
+              "spanId": "8288c7539fc685aa",
+              "parentSpanId": "294cf3baabc904c8",
+              "name": "GET /v1/projects/proj_4a/items/itm_91",
+              "kind": 3,
+              "startTimeUnixNano": "1778835609495000000",
+              "endTimeUnixNano": "1778835609565000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_alpha"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_4a/items/itm_91"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_4a/items/itm_91"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_4a/items/itm_91"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "0a15eefc9735568252186663963df4f9",
+              "spanId": "b48d6f5527bdd2b1",
+              "parentSpanId": "294cf3baabc904c8",
+              "name": "DELETE /v1/projects/proj_4a/items/itm_91",
+              "kind": 3,
+              "startTimeUnixNano": "1778835612565000000",
+              "endTimeUnixNano": "1778835612625000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_alpha"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "DELETE"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_4a/items/itm_91"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_4a/items/itm_91"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_4a/items/itm_91"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 204
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "63a71429b606797c",
+              "name": "integration.session dev_bravo",
+              "kind": 1,
+              "startTimeUnixNano": "1778835618625000000",
+              "endTimeUnixNano": "1778835620625000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "session.kind",
+                  "value": {
+                    "stringValue": "developer-integration"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "eedf9c2183897c8f",
+              "parentSpanId": "63a71429b606797c",
+              "name": "SELECT api_key",
+              "kind": 3,
+              "startTimeUnixNano": "1778835618626000000",
+              "endTimeUnixNano": "1778835618629000000",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "SELECT id FROM api_key WHERE token=$1"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "734220afc1025cc6",
+              "parentSpanId": "63a71429b606797c",
+              "name": "POST /v1/auth/token",
+              "kind": 3,
+              "startTimeUnixNano": "1778835618625000000",
+              "endTimeUnixNano": "1778835618785000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "http.request.mime_type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "10b58d67258dd422",
+              "parentSpanId": "63a71429b606797c",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835621785000000",
+              "endTimeUnixNano": "1778835621840000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 401
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "401"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "a90403ce9da86db1",
+              "parentSpanId": "63a71429b606797c",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835624840000000",
+              "endTimeUnixNano": "1778835624892000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 401
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "401"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "bccd0fd47232952c",
+              "parentSpanId": "63a71429b606797c",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835627892000000",
+              "endTimeUnixNano": "1778835627950000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 401
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "401"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "4a55cd9eb9a3cf04",
+              "parentSpanId": "63a71429b606797c",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835630950000000",
+              "endTimeUnixNano": "1778835631001000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 401
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "401"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "4a70ebcaedb9452f",
+              "parentSpanId": "63a71429b606797c",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835634001000000",
+              "endTimeUnixNano": "1778835634061000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 401
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "401"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "d0a3f44a25690929",
+              "parentSpanId": "63a71429b606797c",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835637061000000",
+              "endTimeUnixNano": "1778835637110000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 401
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "401"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "a3f2ab74ba13b7c5",
+              "parentSpanId": "63a71429b606797c",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835640110000000",
+              "endTimeUnixNano": "1778835640167000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 401
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "401"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "4983b40cd67ddb8ab0ad2bdfa55cb807",
+              "spanId": "869d9502c1ed0bde",
+              "parentSpanId": "63a71429b606797c",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835643167000000",
+              "endTimeUnixNano": "1778835643220000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_bravo"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 401
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "401"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "cf5e9df414a89bede830a4e275a0698d",
+              "spanId": "bb6d642d9cd1342b",
+              "name": "integration.session dev_charlie",
+              "kind": 1,
+              "startTimeUnixNano": "1778835649220000000",
+              "endTimeUnixNano": "1778835651220000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_charlie"
+                  }
+                },
+                {
+                  "key": "session.kind",
+                  "value": {
+                    "stringValue": "developer-integration"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "cf5e9df414a89bede830a4e275a0698d",
+              "spanId": "9efb7b1014465b84",
+              "parentSpanId": "bb6d642d9cd1342b",
+              "name": "SELECT api_key",
+              "kind": 3,
+              "startTimeUnixNano": "1778835649221000000",
+              "endTimeUnixNano": "1778835649224000000",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "SELECT id FROM api_key WHERE token=$1"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "cf5e9df414a89bede830a4e275a0698d",
+              "spanId": "d8b6cd33a4876093",
+              "parentSpanId": "bb6d642d9cd1342b",
+              "name": "POST /v1/auth/token",
+              "kind": 3,
+              "startTimeUnixNano": "1778835649220000000",
+              "endTimeUnixNano": "1778835649395000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_charlie"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "cf5e9df414a89bede830a4e275a0698d",
+              "spanId": "4080715a716811fa",
+              "parentSpanId": "bb6d642d9cd1342b",
+              "name": "POST /v1/exports",
+              "kind": 3,
+              "startTimeUnixNano": "1778835652395000000",
+              "endTimeUnixNano": "1778835652435000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_charlie"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 429
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "429"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "cf5e9df414a89bede830a4e275a0698d",
+              "spanId": "955ac50fcb306378",
+              "parentSpanId": "bb6d642d9cd1342b",
+              "name": "POST /v1/exports",
+              "kind": 3,
+              "startTimeUnixNano": "1778835655435000000",
+              "endTimeUnixNano": "1778835655525000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_charlie"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 429
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "429"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "cf5e9df414a89bede830a4e275a0698d",
+              "spanId": "edb8e0572ca9cc40",
+              "parentSpanId": "bb6d642d9cd1342b",
+              "name": "POST /v1/exports",
+              "kind": 3,
+              "startTimeUnixNano": "1778835658525000000",
+              "endTimeUnixNano": "1778835658725000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_charlie"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 429
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "429"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "cf5e9df414a89bede830a4e275a0698d",
+              "spanId": "45f9eb95dcf86c72",
+              "parentSpanId": "bb6d642d9cd1342b",
+              "name": "POST /v1/exports",
+              "kind": 3,
+              "startTimeUnixNano": "1778835661725000000",
+              "endTimeUnixNano": "1778835662165000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_charlie"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 429
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "429"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "cf5e9df414a89bede830a4e275a0698d",
+              "spanId": "e0d77633969172db",
+              "parentSpanId": "bb6d642d9cd1342b",
+              "name": "POST /v1/exports",
+              "kind": 3,
+              "startTimeUnixNano": "1778835665165000000",
+              "endTimeUnixNano": "1778835665475000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_charlie"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/exports"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "439e568a48209f96",
+              "name": "integration.session dev_delta",
+              "kind": 1,
+              "startTimeUnixNano": "1778835671475000000",
+              "endTimeUnixNano": "1778835673475000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "session.kind",
+                  "value": {
+                    "stringValue": "developer-integration"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "f5cc06bc8ae10099",
+              "parentSpanId": "439e568a48209f96",
+              "name": "SELECT api_key",
+              "kind": 3,
+              "startTimeUnixNano": "1778835671476000000",
+              "endTimeUnixNano": "1778835671479000000",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "SELECT id FROM api_key WHERE token=$1"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "4fa4dd5e5567deed",
+              "parentSpanId": "439e568a48209f96",
+              "name": "POST /v1/auth/token",
+              "kind": 3,
+              "startTimeUnixNano": "1778835671475000000",
+              "endTimeUnixNano": "1778835671640000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "http.request.mime_type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "2e6ea9396f549548",
+              "parentSpanId": "439e568a48209f96",
+              "name": "POST /v1/jobs",
+              "kind": 3,
+              "startTimeUnixNano": "1778835674640000000",
+              "endTimeUnixNano": "1778835674770000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/jobs"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/jobs"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 202
+                  }
+                },
+                {
+                  "key": "http.request.mime_type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "399fdac66915cc55",
+              "parentSpanId": "439e568a48209f96",
+              "name": "GET /v1/jobs/job_77",
+              "kind": 3,
+              "startTimeUnixNano": "1778835677770000000",
+              "endTimeUnixNano": "1778835677815000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 202
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "0e9f26ca04733e81",
+              "parentSpanId": "439e568a48209f96",
+              "name": "GET /v1/jobs/job_77",
+              "kind": 3,
+              "startTimeUnixNano": "1778835680815000000",
+              "endTimeUnixNano": "1778835680862000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 202
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "9ec87ced4fc80fe9",
+              "parentSpanId": "439e568a48209f96",
+              "name": "GET /v1/jobs/job_77",
+              "kind": 3,
+              "startTimeUnixNano": "1778835683862000000",
+              "endTimeUnixNano": "1778835683906000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 202
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "211f91967fbaa39a",
+              "parentSpanId": "439e568a48209f96",
+              "name": "GET /v1/jobs/job_77",
+              "kind": 3,
+              "startTimeUnixNano": "1778835686906000000",
+              "endTimeUnixNano": "1778835686952000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 202
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "2894b172a6a1ad44",
+              "parentSpanId": "439e568a48209f96",
+              "name": "GET /v1/jobs/job_77",
+              "kind": 3,
+              "startTimeUnixNano": "1778835689952000000",
+              "endTimeUnixNano": "1778835690000000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 202
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "26c9d98cd61e9e36",
+              "parentSpanId": "439e568a48209f96",
+              "name": "GET /v1/jobs/job_77",
+              "kind": 3,
+              "startTimeUnixNano": "1778835693000000000",
+              "endTimeUnixNano": "1778835693045000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 202
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "a34286fe5f4b311d0677b0637f778539",
+              "spanId": "97b218c2d1b08477",
+              "parentSpanId": "439e568a48209f96",
+              "name": "GET /v1/jobs/job_77",
+              "kind": 3,
+              "startTimeUnixNano": "1778835696045000000",
+              "endTimeUnixNano": "1778835696125000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_delta"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/jobs/job_77"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "baf2dfcc1189119994a2753c8016a38f",
+              "spanId": "6033d5d0c42e90e5",
+              "name": "integration.session dev_echo",
+              "kind": 1,
+              "startTimeUnixNano": "1778835702125000000",
+              "endTimeUnixNano": "1778835704125000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_echo"
+                  }
+                },
+                {
+                  "key": "session.kind",
+                  "value": {
+                    "stringValue": "developer-integration"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "baf2dfcc1189119994a2753c8016a38f",
+              "spanId": "965ca0998c833b1d",
+              "parentSpanId": "6033d5d0c42e90e5",
+              "name": "SELECT api_key",
+              "kind": 3,
+              "startTimeUnixNano": "1778835702126000000",
+              "endTimeUnixNano": "1778835702129000000",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "SELECT id FROM api_key WHERE token=$1"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "baf2dfcc1189119994a2753c8016a38f",
+              "spanId": "d677eb03bf1355f9",
+              "parentSpanId": "6033d5d0c42e90e5",
+              "name": "POST /v1/auth/token",
+              "kind": 3,
+              "startTimeUnixNano": "1778835702125000000",
+              "endTimeUnixNano": "1778835702295000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_echo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "baf2dfcc1189119994a2753c8016a38f",
+              "spanId": "ca27c6d6bdab97d6",
+              "parentSpanId": "6033d5d0c42e90e5",
+              "name": "POST /v1/projects/proj_7c/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835705295000000",
+              "endTimeUnixNano": "1778835705360000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_echo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 400
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "400"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "baf2dfcc1189119994a2753c8016a38f",
+              "spanId": "7a1e030a155cff7e",
+              "parentSpanId": "6033d5d0c42e90e5",
+              "name": "POST /v1/projects/proj_7c/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835708360000000",
+              "endTimeUnixNano": "1778835708423000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_echo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 400
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "400"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "baf2dfcc1189119994a2753c8016a38f",
+              "spanId": "886dfe24881a4def",
+              "parentSpanId": "6033d5d0c42e90e5",
+              "name": "POST /v1/projects/proj_7c/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835711423000000",
+              "endTimeUnixNano": "1778835711489000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_echo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 400
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "400"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "baf2dfcc1189119994a2753c8016a38f",
+              "spanId": "48e9dd972a6e5271",
+              "parentSpanId": "6033d5d0c42e90e5",
+              "name": "POST /v1/projects/proj_7c/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835714489000000",
+              "endTimeUnixNano": "1778835714699000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_echo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_7c/items"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 201
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "eb0c9590648f73deeb07ab9b082502d7",
+              "spanId": "8e07d2ee5ce47697",
+              "name": "integration.session dev_foxtrot",
+              "kind": 1,
+              "startTimeUnixNano": "1778835720699000000",
+              "endTimeUnixNano": "1778835722699000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_foxtrot"
+                  }
+                },
+                {
+                  "key": "session.kind",
+                  "value": {
+                    "stringValue": "developer-integration"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "eb0c9590648f73deeb07ab9b082502d7",
+              "spanId": "9cbd4f66756e41f5",
+              "parentSpanId": "8e07d2ee5ce47697",
+              "name": "SELECT api_key",
+              "kind": 3,
+              "startTimeUnixNano": "1778835720700000000",
+              "endTimeUnixNano": "1778835720703000000",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "SELECT id FROM api_key WHERE token=$1"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "eb0c9590648f73deeb07ab9b082502d7",
+              "spanId": "c099584f35273979",
+              "parentSpanId": "8e07d2ee5ce47697",
+              "name": "POST /v1/auth/token",
+              "kind": 3,
+              "startTimeUnixNano": "1778835720699000000",
+              "endTimeUnixNano": "1778835720857000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_foxtrot"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "http.request.mime_type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "eb0c9590648f73deeb07ab9b082502d7",
+              "spanId": "731c79500a28cad5",
+              "parentSpanId": "8e07d2ee5ce47697",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835723857000000",
+              "endTimeUnixNano": "1778835723945000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_foxtrot"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "eb0c9590648f73deeb07ab9b082502d7",
+              "spanId": "61a557ed37a5c97a",
+              "parentSpanId": "8e07d2ee5ce47697",
+              "name": "GET /v1/projects/proj_2b/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835726945000000",
+              "endTimeUnixNano": "1778835728145000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_foxtrot"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 502
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "502"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "eb0c9590648f73deeb07ab9b082502d7",
+              "spanId": "82caf8dc608afdb9",
+              "parentSpanId": "8e07d2ee5ce47697",
+              "name": "GET /v1/projects/proj_2b/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835731145000000",
+              "endTimeUnixNano": "1778835731285000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_foxtrot"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "eb0c9590648f73deeb07ab9b082502d7",
+              "spanId": "1ed9b4661273e96f",
+              "parentSpanId": "8e07d2ee5ce47697",
+              "name": "GET /v1/projects/proj_2b/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835734285000000",
+              "endTimeUnixNano": "1778835735185000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_foxtrot"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 500
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "500"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "eb0c9590648f73deeb07ab9b082502d7",
+              "spanId": "05a7f37e160bf4c4",
+              "parentSpanId": "8e07d2ee5ce47697",
+              "name": "GET /v1/projects/proj_2b/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835738185000000",
+              "endTimeUnixNano": "1778835739135000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_foxtrot"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 500
+                  }
+                },
+                {
+                  "key": "exception.type",
+                  "value": {
+                    "stringValue": "500"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "eb0c9590648f73deeb07ab9b082502d7",
+              "spanId": "5dd0dce27433748d",
+              "parentSpanId": "8e07d2ee5ce47697",
+              "name": "GET /v1/projects/proj_2b/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835742135000000",
+              "endTimeUnixNano": "1778835742285000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_foxtrot"
+                  }
+                },
+                {
+                  "key": "http.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "http.target",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.url",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_2b/items"
+                  }
+                },
+                {
+                  "key": "http.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "31aa498cad94308fda5e39d478090923",
+              "spanId": "eebe6646040bbf66",
+              "name": "integration.session dev_golf",
+              "kind": 1,
+              "startTimeUnixNano": "1778835748285000000",
+              "endTimeUnixNano": "1778835750285000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_golf"
+                  }
+                },
+                {
+                  "key": "session.kind",
+                  "value": {
+                    "stringValue": "developer-integration"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "31aa498cad94308fda5e39d478090923",
+              "spanId": "78631c7b32e0682a",
+              "parentSpanId": "eebe6646040bbf66",
+              "name": "SELECT api_key",
+              "kind": 3,
+              "startTimeUnixNano": "1778835748286000000",
+              "endTimeUnixNano": "1778835748289000000",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "SELECT id FROM api_key WHERE token=$1"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "31aa498cad94308fda5e39d478090923",
+              "spanId": "00f10de1fa05c3ab",
+              "parentSpanId": "eebe6646040bbf66",
+              "name": "POST /v1/auth/token",
+              "kind": 3,
+              "startTimeUnixNano": "1778835748285000000",
+              "endTimeUnixNano": "1778835748457000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_golf"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "31aa498cad94308fda5e39d478090923",
+              "spanId": "f6801a6493dae4d5",
+              "parentSpanId": "eebe6646040bbf66",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835751457000000",
+              "endTimeUnixNano": "1778835751567000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_golf"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects?page=1&limit=50"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "url.query",
+                  "value": {
+                    "stringValue": "page=1&limit=50"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "31aa498cad94308fda5e39d478090923",
+              "spanId": "5a07fbf3b6fcb472",
+              "parentSpanId": "eebe6646040bbf66",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835754567000000",
+              "endTimeUnixNano": "1778835754682000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_golf"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects?page=2&limit=50"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "url.query",
+                  "value": {
+                    "stringValue": "page=2&limit=50"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "31aa498cad94308fda5e39d478090923",
+              "spanId": "1eb28fb42398b1a7",
+              "parentSpanId": "eebe6646040bbf66",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835757682000000",
+              "endTimeUnixNano": "1778835757802000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_golf"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects?page=3&limit=50"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "url.query",
+                  "value": {
+                    "stringValue": "page=3&limit=50"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "31aa498cad94308fda5e39d478090923",
+              "spanId": "daa360f50848dd86",
+              "parentSpanId": "eebe6646040bbf66",
+              "name": "GET /v1/search",
+              "kind": 3,
+              "startTimeUnixNano": "1778835760802000000",
+              "endTimeUnixNano": "1778835760932000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_golf"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/search"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/search?q=onboarding&type=doc"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/search"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": 200
+                  }
+                },
+                {
+                  "key": "url.query",
+                  "value": {
+                    "stringValue": "q=onboarding&type=doc"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
