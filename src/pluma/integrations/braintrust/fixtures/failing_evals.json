@@ -2,9 +2,14 @@
   "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
   "experiment_name": "routing_classifier_eval_v3",
   "project_name": "support-router",
+  "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12",
   "total": 36,
   "passed": 25,
   "pass_rate": 0.6944,
+  "score_band": {
+    "min": 1.0,
+    "max": 1.0
+  },
   "threshold": 1.0,
   "meets_threshold": false,
   "results": [
@@ -19,7 +24,8 @@
       "output": "account_management",
       "scores": {
         "exact_match": 0.0,
-        "calibrated_confidence": 0.74
+        "calibrated_confidence": 0.74,
+        "factuality": 1.0
       },
       "metadata": {
         "model": "gpt-4o-mini",
@@ -30,16 +36,123 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e003-0b36-4f1a-9c36-000000000003"
+        "row_id": "a1c0e003-0b36-4f1a-9c36-000000000003",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:03:00.000Z",
+      "spans": [
+        {
+          "span_id": "sp-0003-root",
+          "parent_span_id": null,
+          "name": "classify_intent",
+          "input": {
+            "message": "I was billed for a seat I removed last week.",
+            "channel": "email"
+          },
+          "output": {
+            "intent": "account_management"
+          },
+          "start": "2026-05-14T09:03:00.100Z",
+          "end": "2026-05-14T09:03:00.940Z",
+          "metadata": {
+            "model": "gpt-4o-mini",
+            "step": "root"
+          }
+        },
+        {
+          "span_id": "sp-0003-c0",
+          "parent_span_id": "sp-0003-root",
+          "name": "llm.completion",
+          "input": {
+            "prompt": "Classify the intent of the user message."
+          },
+          "output": {
+            "label": "account_management",
+            "logprob": -0.42
+          },
+          "start": "2026-05-14T09:03:01.000Z",
+          "end": "2026-05-14T09:03:01.120Z",
+          "metadata": {
+            "tokens_in": 180,
+            "tokens_out": 3
+          }
+        },
+        {
+          "span_id": "sp-0003-c1",
+          "parent_span_id": "sp-0003-root",
+          "name": "lookup_kb",
+          "input": {
+            "query": "I was billed for a seat I removed last week."
+          },
+          "output": {
+            "hits": 2,
+            "top_doc": "kb/routing.md"
+          },
+          "start": "2026-05-14T09:03:02.000Z",
+          "end": "2026-05-14T09:03:02.120Z",
+          "metadata": {
+            "latency_ms": 35
+          }
+        },
+        {
+          "span_id": "sp-0003-c2",
+          "parent_span_id": "sp-0003-root",
+          "name": "format_response",
+          "input": {
+            "intent": "account_management"
+          },
+          "output": {
+            "routed_to": "account_management"
+          },
+          "start": "2026-05-14T09:03:03.000Z",
+          "end": "2026-05-14T09:03:03.120Z",
+          "metadata": {}
+        },
+        {
+          "span_id": "sp-0003-deep",
+          "parent_span_id": "sp-0003-c0",
+          "name": "tool.search",
+          "input": {
+            "q": "kb routing rules"
+          },
+          "output": {
+            "results": [
+              "doc-1",
+              "doc-2"
+            ]
+          },
+          "start": "2026-05-14T09:03:04.000Z",
+          "end": "2026-05-14T09:03:04.080Z",
+          "metadata": {
+            "nested": true,
+            "depth": 2
+          }
+        }
+      ],
       "scenario_id": "a1c0e003-0b36-4f1a-9c36-000000000003",
       "predicted": "account_management",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='billing' output='account_management'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e003-0b36-4f1a-9c36-000000000003."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.74,
+          "passed": false,
+          "is_primary": false
+        },
+        "factuality": {
+          "score": 1.0,
+          "passed": true,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='billing' output='account_management'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e003-0b36-4f1a-9c36-000000000003."
     },
     {
       "id": "a1c0e007-0b36-4f1a-9c36-000000000007",
@@ -64,22 +177,87 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e007-0b36-4f1a-9c36-000000000007"
+        "row_id": "a1c0e007-0b36-4f1a-9c36-000000000007",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:07:00.000Z",
+      "spans": [
+        {
+          "span_id": "sp-0007-root",
+          "parent_span_id": null,
+          "name": "classify_intent",
+          "input": {
+            "message": "Stop everything, I'm closing the account today.",
+            "channel": "phone"
+          },
+          "output": {
+            "intent": "technical_support"
+          },
+          "start": "2026-05-14T09:07:00.100Z",
+          "end": "2026-05-14T09:07:00.940Z",
+          "metadata": {
+            "model": "gpt-4o-mini",
+            "step": "root"
+          }
+        },
+        {
+          "span_id": "sp-0007-c0",
+          "parent_span_id": "sp-0007-root",
+          "name": "llm.completion",
+          "input": {
+            "prompt": "Classify the intent of the user message."
+          },
+          "output": {
+            "label": "technical_support",
+            "logprob": -0.42
+          },
+          "start": "2026-05-14T09:07:01.000Z",
+          "end": "2026-05-14T09:07:01.120Z",
+          "metadata": {
+            "tokens_in": 180,
+            "tokens_out": 3
+          }
+        },
+        {
+          "span_id": "sp-0007-c1",
+          "parent_span_id": "sp-0007-root",
+          "name": "format_response",
+          "input": {
+            "intent": "technical_support"
+          },
+          "output": {
+            "routed_to": "technical_support"
+          },
+          "start": "2026-05-14T09:07:02.000Z",
+          "end": "2026-05-14T09:07:02.120Z",
+          "metadata": {}
+        }
+      ],
       "scenario_id": "a1c0e007-0b36-4f1a-9c36-000000000007",
       "predicted": "technical_support",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='cancellation' output='technical_support'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e007-0b36-4f1a-9c36-000000000007."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.66,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='cancellation' output='technical_support'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e007-0b36-4f1a-9c36-000000000007."
     },
     {
       "id": "a1c0e011-0b36-4f1a-9c36-000000000011",
       "span_id": "span-0011",
       "input": {
-        "message": "We're evaluating tools — what makes you different?",
+        "message": "We're evaluating tools \u2014 what makes you different?",
         "channel": "email"
       },
       "expected": "sales",
@@ -98,16 +276,118 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e011-0b36-4f1a-9c36-000000000011"
+        "row_id": "a1c0e011-0b36-4f1a-9c36-000000000011",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:11:00.000Z",
+      "spans": [
+        {
+          "span_id": "sp-0011-root",
+          "parent_span_id": null,
+          "name": "classify_intent",
+          "input": {
+            "message": "We're evaluating tools \u2014 what makes you different?",
+            "channel": "email"
+          },
+          "output": {
+            "intent": "general_inquiry"
+          },
+          "start": "2026-05-14T09:11:00.100Z",
+          "end": "2026-05-14T09:11:00.940Z",
+          "metadata": {
+            "model": "gpt-4o-mini",
+            "step": "root"
+          }
+        },
+        {
+          "span_id": "sp-0011-c0",
+          "parent_span_id": "sp-0011-root",
+          "name": "llm.completion",
+          "input": {
+            "prompt": "Classify the intent of the user message."
+          },
+          "output": {
+            "label": "general_inquiry",
+            "logprob": -0.42
+          },
+          "start": "2026-05-14T09:11:01.000Z",
+          "end": "2026-05-14T09:11:01.120Z",
+          "metadata": {
+            "tokens_in": 180,
+            "tokens_out": 3
+          }
+        },
+        {
+          "span_id": "sp-0011-c1",
+          "parent_span_id": "sp-0011-root",
+          "name": "lookup_kb",
+          "input": {
+            "query": "We're evaluating tools \u2014 what makes you different?"
+          },
+          "output": {
+            "hits": 2,
+            "top_doc": "kb/routing.md"
+          },
+          "start": "2026-05-14T09:11:02.000Z",
+          "end": "2026-05-14T09:11:02.120Z",
+          "metadata": {
+            "latency_ms": 35
+          }
+        },
+        {
+          "span_id": "sp-0011-c2",
+          "parent_span_id": "sp-0011-root",
+          "name": "format_response",
+          "input": {
+            "intent": "general_inquiry"
+          },
+          "output": {
+            "routed_to": "general_inquiry"
+          },
+          "start": "2026-05-14T09:11:03.000Z",
+          "end": "2026-05-14T09:11:03.120Z",
+          "metadata": {}
+        },
+        {
+          "span_id": "sp-0011-deep",
+          "parent_span_id": "sp-0011-c0",
+          "name": "tool.search",
+          "input": {
+            "q": "kb routing rules"
+          },
+          "output": {
+            "results": [
+              "doc-1",
+              "doc-2"
+            ]
+          },
+          "start": "2026-05-14T09:11:04.000Z",
+          "end": "2026-05-14T09:11:04.080Z",
+          "metadata": {
+            "nested": true,
+            "depth": 2
+          }
+        }
+      ],
       "scenario_id": "a1c0e011-0b36-4f1a-9c36-000000000011",
       "predicted": "general_inquiry",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='sales' output='general_inquiry'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e011-0b36-4f1a-9c36-000000000011."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.58,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='sales' output='general_inquiry'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e011-0b36-4f1a-9c36-000000000011."
     },
     {
       "id": "a1c0e014-0b36-4f1a-9c36-000000000014",
@@ -120,7 +400,8 @@
       "output": "billing",
       "scores": {
         "exact_match": 0.0,
-        "calibrated_confidence": 0.71
+        "calibrated_confidence": 0.71,
+        "factuality": 0.0
       },
       "metadata": {
         "model": "gpt-4o-mini",
@@ -131,16 +412,123 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e014-0b36-4f1a-9c36-000000000014"
+        "row_id": "a1c0e014-0b36-4f1a-9c36-000000000014",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:14:00.000Z",
+      "spans": [
+        {
+          "span_id": "sp-0014-root",
+          "parent_span_id": null,
+          "name": "classify_intent",
+          "input": {
+            "message": "Charts show wrong totals after the latest update.",
+            "channel": "chat"
+          },
+          "output": {
+            "intent": "billing"
+          },
+          "start": "2026-05-14T09:14:00.100Z",
+          "end": "2026-05-14T09:14:00.940Z",
+          "metadata": {
+            "model": "gpt-4o-mini",
+            "step": "root"
+          }
+        },
+        {
+          "span_id": "sp-0014-c0",
+          "parent_span_id": "sp-0014-root",
+          "name": "llm.completion",
+          "input": {
+            "prompt": "Classify the intent of the user message."
+          },
+          "output": {
+            "label": "billing",
+            "logprob": -0.42
+          },
+          "start": "2026-05-14T09:14:01.000Z",
+          "end": "2026-05-14T09:14:01.120Z",
+          "metadata": {
+            "tokens_in": 180,
+            "tokens_out": 3
+          }
+        },
+        {
+          "span_id": "sp-0014-c1",
+          "parent_span_id": "sp-0014-root",
+          "name": "lookup_kb",
+          "input": {
+            "query": "Charts show wrong totals after the latest update."
+          },
+          "output": {
+            "hits": 2,
+            "top_doc": "kb/routing.md"
+          },
+          "start": "2026-05-14T09:14:02.000Z",
+          "end": "2026-05-14T09:14:02.120Z",
+          "metadata": {
+            "latency_ms": 35
+          }
+        },
+        {
+          "span_id": "sp-0014-c2",
+          "parent_span_id": "sp-0014-root",
+          "name": "format_response",
+          "input": {
+            "intent": "billing"
+          },
+          "output": {
+            "routed_to": "billing"
+          },
+          "start": "2026-05-14T09:14:03.000Z",
+          "end": "2026-05-14T09:14:03.120Z",
+          "metadata": {}
+        },
+        {
+          "span_id": "sp-0014-deep",
+          "parent_span_id": "sp-0014-c0",
+          "name": "tool.search",
+          "input": {
+            "q": "kb routing rules"
+          },
+          "output": {
+            "results": [
+              "doc-1",
+              "doc-2"
+            ]
+          },
+          "start": "2026-05-14T09:14:04.000Z",
+          "end": "2026-05-14T09:14:04.080Z",
+          "metadata": {
+            "nested": true,
+            "depth": 2
+          }
+        }
+      ],
       "scenario_id": "a1c0e014-0b36-4f1a-9c36-000000000014",
       "predicted": "billing",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='technical_support' output='billing'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e014-0b36-4f1a-9c36-000000000014."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.71,
+          "passed": false,
+          "is_primary": false
+        },
+        "factuality": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='technical_support' output='billing'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e014-0b36-4f1a-9c36-000000000014."
     },
     {
       "id": "a1c0e018-0b36-4f1a-9c36-000000000018",
@@ -164,16 +552,80 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e018-0b36-4f1a-9c36-000000000018"
+        "row_id": "a1c0e018-0b36-4f1a-9c36-000000000018",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:18:00.000Z",
+      "spans": [
+        {
+          "span_id": "sp-0018-root",
+          "parent_span_id": null,
+          "name": "classify_intent",
+          "input": {
+            "message": "Remove the old admin who left the company.",
+            "channel": "email"
+          },
+          "output": {
+            "intent": "billing"
+          },
+          "start": "2026-05-14T09:18:00.100Z",
+          "end": "2026-05-14T09:18:00.940Z",
+          "metadata": {
+            "model": "gpt-4o-mini",
+            "step": "root"
+          }
+        },
+        {
+          "span_id": "sp-0018-c0",
+          "parent_span_id": "sp-0018-root",
+          "name": "lookup_kb",
+          "input": {
+            "query": "Remove the old admin who left the company."
+          },
+          "output": {
+            "hits": 2,
+            "top_doc": "kb/routing.md"
+          },
+          "start": "2026-05-14T09:18:01.000Z",
+          "end": "2026-05-14T09:18:01.120Z",
+          "metadata": {
+            "latency_ms": 35
+          }
+        },
+        {
+          "span_id": "sp-0018-c1",
+          "parent_span_id": "sp-0018-root",
+          "name": "format_response",
+          "input": {
+            "intent": "billing"
+          },
+          "output": {
+            "routed_to": "billing"
+          },
+          "start": "2026-05-14T09:18:02.000Z",
+          "end": "2026-05-14T09:18:02.120Z",
+          "metadata": {}
+        }
+      ],
       "scenario_id": "a1c0e018-0b36-4f1a-9c36-000000000018",
       "predicted": "billing",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='account_management' output='billing'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e018-0b36-4f1a-9c36-000000000018."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.69,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='account_management' output='billing'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e018-0b36-4f1a-9c36-000000000018."
     },
     {
       "id": "a1c0e021-0b36-4f1a-9c36-000000000021",
@@ -197,16 +649,118 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e021-0b36-4f1a-9c36-000000000021"
+        "row_id": "a1c0e021-0b36-4f1a-9c36-000000000021",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:21:00.000Z",
+      "spans": [
+        {
+          "span_id": "sp-0021-root",
+          "parent_span_id": null,
+          "name": "classify_intent",
+          "input": {
+            "message": "Do you accept ACH for annual invoices?",
+            "channel": "email"
+          },
+          "output": {
+            "intent": "general_inquiry"
+          },
+          "start": "2026-05-14T09:21:00.100Z",
+          "end": "2026-05-14T09:21:00.940Z",
+          "metadata": {
+            "model": "gpt-4o-mini",
+            "step": "root"
+          }
+        },
+        {
+          "span_id": "sp-0021-c0",
+          "parent_span_id": "sp-0021-root",
+          "name": "llm.completion",
+          "input": {
+            "prompt": "Classify the intent of the user message."
+          },
+          "output": {
+            "label": "general_inquiry",
+            "logprob": -0.42
+          },
+          "start": "2026-05-14T09:21:01.000Z",
+          "end": "2026-05-14T09:21:01.120Z",
+          "metadata": {
+            "tokens_in": 180,
+            "tokens_out": 3
+          }
+        },
+        {
+          "span_id": "sp-0021-c1",
+          "parent_span_id": "sp-0021-root",
+          "name": "lookup_kb",
+          "input": {
+            "query": "Do you accept ACH for annual invoices?"
+          },
+          "output": {
+            "hits": 2,
+            "top_doc": "kb/routing.md"
+          },
+          "start": "2026-05-14T09:21:02.000Z",
+          "end": "2026-05-14T09:21:02.120Z",
+          "metadata": {
+            "latency_ms": 35
+          }
+        },
+        {
+          "span_id": "sp-0021-c2",
+          "parent_span_id": "sp-0021-root",
+          "name": "format_response",
+          "input": {
+            "intent": "general_inquiry"
+          },
+          "output": {
+            "routed_to": "general_inquiry"
+          },
+          "start": "2026-05-14T09:21:03.000Z",
+          "end": "2026-05-14T09:21:03.120Z",
+          "metadata": {}
+        },
+        {
+          "span_id": "sp-0021-deep",
+          "parent_span_id": "sp-0021-c0",
+          "name": "tool.search",
+          "input": {
+            "q": "kb routing rules"
+          },
+          "output": {
+            "results": [
+              "doc-1",
+              "doc-2"
+            ]
+          },
+          "start": "2026-05-14T09:21:04.000Z",
+          "end": "2026-05-14T09:21:04.080Z",
+          "metadata": {
+            "nested": true,
+            "depth": 2
+          }
+        }
+      ],
       "scenario_id": "a1c0e021-0b36-4f1a-9c36-000000000021",
       "predicted": "general_inquiry",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='billing' output='general_inquiry'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e021-0b36-4f1a-9c36-000000000021."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.62,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='billing' output='general_inquiry'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e021-0b36-4f1a-9c36-000000000021."
     },
     {
       "id": "a1c0e025-0b36-4f1a-9c36-000000000025",
@@ -219,7 +773,8 @@
       "output": "account_management",
       "scores": {
         "exact_match": 0.0,
-        "calibrated_confidence": 0.55
+        "calibrated_confidence": 0.55,
+        "factuality": 1.0
       },
       "metadata": {
         "model": "gpt-4o-mini",
@@ -231,16 +786,86 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e025-0b36-4f1a-9c36-000000000025"
+        "row_id": "a1c0e025-0b36-4f1a-9c36-000000000025",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:25:00.000Z",
+      "spans": [
+        {
+          "span_id": "sp-0025-root",
+          "parent_span_id": null,
+          "name": "classify_intent",
+          "input": {
+            "message": "We won't be renewing; wind down our workspace.",
+            "channel": "email"
+          },
+          "output": {
+            "intent": "account_management"
+          },
+          "start": "2026-05-14T09:25:00.100Z",
+          "end": "2026-05-14T09:25:00.940Z",
+          "metadata": {
+            "model": "gpt-4o-mini",
+            "step": "root"
+          }
+        },
+        {
+          "span_id": "sp-0025-c0",
+          "parent_span_id": "sp-0025-root",
+          "name": "llm.completion",
+          "input": {
+            "prompt": "Classify the intent of the user message."
+          },
+          "output": {
+            "label": "account_management",
+            "logprob": -0.42
+          },
+          "start": "2026-05-14T09:25:01.000Z",
+          "end": "2026-05-14T09:25:01.120Z",
+          "metadata": {
+            "tokens_in": 180,
+            "tokens_out": 3
+          }
+        },
+        {
+          "span_id": "sp-0025-c1",
+          "parent_span_id": "sp-0025-root",
+          "name": "format_response",
+          "input": {
+            "intent": "account_management"
+          },
+          "output": {
+            "routed_to": "account_management"
+          },
+          "start": "2026-05-14T09:25:02.000Z",
+          "end": "2026-05-14T09:25:02.120Z",
+          "metadata": {}
+        }
+      ],
       "scenario_id": "a1c0e025-0b36-4f1a-9c36-000000000025",
       "predicted": "account_management",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='cancellation' output='account_management'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e025-0b36-4f1a-9c36-000000000025."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.55,
+          "passed": false,
+          "is_primary": false
+        },
+        "factuality": {
+          "score": 1.0,
+          "passed": true,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='cancellation' output='account_management'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e025-0b36-4f1a-9c36-000000000025."
     },
     {
       "id": "a1c0e028-0b36-4f1a-9c36-000000000028",
@@ -263,7 +888,8 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e028-0b36-4f1a-9c36-000000000028"
+        "row_id": "a1c0e028-0b36-4f1a-9c36-000000000028",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:28:00.000Z",
       "scenario_id": "a1c0e028-0b36-4f1a-9c36-000000000028",
@@ -272,7 +898,15 @@
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='technical_support' output='general_inquiry'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e028-0b36-4f1a-9c36-000000000028."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        }
+      },
+      "spans": null,
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='technical_support' output='general_inquiry'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e028-0b36-4f1a-9c36-000000000028."
     },
     {
       "id": "a1c0e031-0b36-4f1a-9c36-000000000031",
@@ -285,7 +919,8 @@
       "output": "billing",
       "scores": {
         "exact_match": 0.0,
-        "calibrated_confidence": 0.7
+        "calibrated_confidence": 0.7,
+        "factuality": 0.6
       },
       "metadata": {
         "model": "gpt-4o-mini",
@@ -297,16 +932,939 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e031-0b36-4f1a-9c36-000000000031"
+        "row_id": "a1c0e031-0b36-4f1a-9c36-000000000031",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:31:00.000Z",
+      "spans": [
+        {
+          "span_id": "sp-0031-root",
+          "parent_span_id": null,
+          "name": "classify_intent",
+          "input": {
+            "message": "Quote us for 200 seats with annual terms."
+          },
+          "output": {
+            "intent": "billing"
+          },
+          "start": "2026-05-14T09:31:00.000Z",
+          "end": "2026-05-14T09:31:59.000Z",
+          "metadata": {
+            "step": "root",
+            "fanout": 74
+          }
+        },
+        {
+          "span_id": "sp-0031-s000",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 0,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 0,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:00.000Z",
+          "end": "2026-05-14T09:31:00.001Z",
+          "metadata": {
+            "iteration": 0
+          }
+        },
+        {
+          "span_id": "sp-0031-s001",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 1,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 1,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:01.131Z",
+          "end": "2026-05-14T09:31:01.132Z",
+          "metadata": {
+            "iteration": 1
+          }
+        },
+        {
+          "span_id": "sp-0031-s002",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 2,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 2,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:02.262Z",
+          "end": "2026-05-14T09:31:02.263Z",
+          "metadata": {
+            "iteration": 2
+          }
+        },
+        {
+          "span_id": "sp-0031-s003",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 3,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 3,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:03.393Z",
+          "end": "2026-05-14T09:31:03.394Z",
+          "metadata": {
+            "iteration": 3
+          }
+        },
+        {
+          "span_id": "sp-0031-s004",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 4,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 4,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:04.524Z",
+          "end": "2026-05-14T09:31:04.525Z",
+          "metadata": {
+            "iteration": 4
+          }
+        },
+        {
+          "span_id": "sp-0031-s005",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 5,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 5,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:05.655Z",
+          "end": "2026-05-14T09:31:05.656Z",
+          "metadata": {
+            "iteration": 5
+          }
+        },
+        {
+          "span_id": "sp-0031-s006",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 6,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 6,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:06.786Z",
+          "end": "2026-05-14T09:31:06.787Z",
+          "metadata": {
+            "iteration": 6
+          }
+        },
+        {
+          "span_id": "sp-0031-s007",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 7,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 7,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:07.917Z",
+          "end": "2026-05-14T09:31:07.918Z",
+          "metadata": {
+            "iteration": 7
+          }
+        },
+        {
+          "span_id": "sp-0031-s008",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 8,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 8,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:08.048Z",
+          "end": "2026-05-14T09:31:08.049Z",
+          "metadata": {
+            "iteration": 8
+          }
+        },
+        {
+          "span_id": "sp-0031-s009",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 9,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 9,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:09.179Z",
+          "end": "2026-05-14T09:31:09.180Z",
+          "metadata": {
+            "iteration": 9
+          }
+        },
+        {
+          "span_id": "sp-0031-s010",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 10,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 10,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:10.310Z",
+          "end": "2026-05-14T09:31:10.311Z",
+          "metadata": {
+            "iteration": 10
+          }
+        },
+        {
+          "span_id": "sp-0031-s011",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 11,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 11,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:11.441Z",
+          "end": "2026-05-14T09:31:11.442Z",
+          "metadata": {
+            "iteration": 11
+          }
+        },
+        {
+          "span_id": "sp-0031-s012",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 12,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 12,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:12.572Z",
+          "end": "2026-05-14T09:31:12.573Z",
+          "metadata": {
+            "iteration": 12
+          }
+        },
+        {
+          "span_id": "sp-0031-s013",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 13,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 13,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:13.703Z",
+          "end": "2026-05-14T09:31:13.704Z",
+          "metadata": {
+            "iteration": 13
+          }
+        },
+        {
+          "span_id": "sp-0031-s014",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 14,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 14,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:14.834Z",
+          "end": "2026-05-14T09:31:14.835Z",
+          "metadata": {
+            "iteration": 14
+          }
+        },
+        {
+          "span_id": "sp-0031-s015",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 15,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 15,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:15.965Z",
+          "end": "2026-05-14T09:31:15.966Z",
+          "metadata": {
+            "iteration": 15
+          }
+        },
+        {
+          "span_id": "sp-0031-s016",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 16,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 16,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:16.096Z",
+          "end": "2026-05-14T09:31:16.097Z",
+          "metadata": {
+            "iteration": 16
+          }
+        },
+        {
+          "span_id": "sp-0031-s017",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 17,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 17,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:17.227Z",
+          "end": "2026-05-14T09:31:17.228Z",
+          "metadata": {
+            "iteration": 17
+          }
+        },
+        {
+          "span_id": "sp-0031-s018",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 18,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 18,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:18.358Z",
+          "end": "2026-05-14T09:31:18.359Z",
+          "metadata": {
+            "iteration": 18
+          }
+        },
+        {
+          "span_id": "sp-0031-s019",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 19,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 19,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:19.489Z",
+          "end": "2026-05-14T09:31:19.490Z",
+          "metadata": {
+            "iteration": 19
+          }
+        },
+        {
+          "span_id": "sp-0031-s020",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 20,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 20,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:20.620Z",
+          "end": "2026-05-14T09:31:20.621Z",
+          "metadata": {
+            "iteration": 20
+          }
+        },
+        {
+          "span_id": "sp-0031-s021",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 21,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 21,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:21.751Z",
+          "end": "2026-05-14T09:31:21.752Z",
+          "metadata": {
+            "iteration": 21
+          }
+        },
+        {
+          "span_id": "sp-0031-s022",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 22,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 22,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:22.882Z",
+          "end": "2026-05-14T09:31:22.883Z",
+          "metadata": {
+            "iteration": 22
+          }
+        },
+        {
+          "span_id": "sp-0031-s023",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 23,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 23,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:23.013Z",
+          "end": "2026-05-14T09:31:23.014Z",
+          "metadata": {
+            "iteration": 23
+          }
+        },
+        {
+          "span_id": "sp-0031-s024",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 24,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 24,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:24.144Z",
+          "end": "2026-05-14T09:31:24.145Z",
+          "metadata": {
+            "iteration": 24
+          }
+        },
+        {
+          "span_id": "sp-0031-s025",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 25,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 25,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:25.275Z",
+          "end": "2026-05-14T09:31:25.276Z",
+          "metadata": {
+            "iteration": 25
+          }
+        },
+        {
+          "span_id": "sp-0031-s026",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 26,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 26,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:26.406Z",
+          "end": "2026-05-14T09:31:26.407Z",
+          "metadata": {
+            "iteration": 26
+          }
+        },
+        {
+          "span_id": "sp-0031-s027",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 27,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 27,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:27.537Z",
+          "end": "2026-05-14T09:31:27.538Z",
+          "metadata": {
+            "iteration": 27
+          }
+        },
+        {
+          "span_id": "sp-0031-s028",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 28,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 28,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:28.668Z",
+          "end": "2026-05-14T09:31:28.669Z",
+          "metadata": {
+            "iteration": 28
+          }
+        },
+        {
+          "span_id": "sp-0031-s029",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 29,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 29,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:29.799Z",
+          "end": "2026-05-14T09:31:29.800Z",
+          "metadata": {
+            "iteration": 29
+          }
+        },
+        {
+          "span_id": "sp-0031-s030",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 30,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 30,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:30.930Z",
+          "end": "2026-05-14T09:31:30.931Z",
+          "metadata": {
+            "iteration": 30
+          }
+        },
+        {
+          "span_id": "sp-0031-s031",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 31,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 31,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:31.061Z",
+          "end": "2026-05-14T09:31:31.062Z",
+          "metadata": {
+            "iteration": 31
+          }
+        },
+        {
+          "span_id": "sp-0031-s032",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 32,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 32,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:32.192Z",
+          "end": "2026-05-14T09:31:32.193Z",
+          "metadata": {
+            "iteration": 32
+          }
+        },
+        {
+          "span_id": "sp-0031-s033",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 33,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 33,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:33.323Z",
+          "end": "2026-05-14T09:31:33.324Z",
+          "metadata": {
+            "iteration": 33
+          }
+        },
+        {
+          "span_id": "sp-0031-s034",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 34,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 34,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:34.454Z",
+          "end": "2026-05-14T09:31:34.455Z",
+          "metadata": {
+            "iteration": 34
+          }
+        },
+        {
+          "span_id": "sp-0031-s035",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 35,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 35,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:35.585Z",
+          "end": "2026-05-14T09:31:35.586Z",
+          "metadata": {
+            "iteration": 35
+          }
+        },
+        {
+          "span_id": "sp-0031-s036",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 36,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 36,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:36.716Z",
+          "end": "2026-05-14T09:31:36.717Z",
+          "metadata": {
+            "iteration": 36
+          }
+        },
+        {
+          "span_id": "sp-0031-s037",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 37,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 37,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:37.847Z",
+          "end": "2026-05-14T09:31:37.848Z",
+          "metadata": {
+            "iteration": 37
+          }
+        },
+        {
+          "span_id": "sp-0031-s038",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 38,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 38,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:38.978Z",
+          "end": "2026-05-14T09:31:38.979Z",
+          "metadata": {
+            "iteration": 38
+          }
+        },
+        {
+          "span_id": "sp-0031-s039",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 39,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 39,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:39.109Z",
+          "end": "2026-05-14T09:31:39.110Z",
+          "metadata": {
+            "iteration": 39
+          }
+        },
+        {
+          "span_id": "sp-0031-s040",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 40,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 40,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:40.240Z",
+          "end": "2026-05-14T09:31:40.241Z",
+          "metadata": {
+            "iteration": 40
+          }
+        },
+        {
+          "span_id": "sp-0031-s041",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 41,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 41,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:41.371Z",
+          "end": "2026-05-14T09:31:41.372Z",
+          "metadata": {
+            "iteration": 41
+          }
+        },
+        {
+          "span_id": "sp-0031-s042",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 42,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 42,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:42.502Z",
+          "end": "2026-05-14T09:31:42.503Z",
+          "metadata": {
+            "iteration": 42
+          }
+        },
+        {
+          "span_id": "sp-0031-s043",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 43,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 43,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:43.633Z",
+          "end": "2026-05-14T09:31:43.634Z",
+          "metadata": {
+            "iteration": 43
+          }
+        },
+        {
+          "span_id": "sp-0031-s044",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 44,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 44,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:44.764Z",
+          "end": "2026-05-14T09:31:44.765Z",
+          "metadata": {
+            "iteration": 44
+          }
+        },
+        {
+          "span_id": "sp-0031-s045",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 45,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 45,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:45.895Z",
+          "end": "2026-05-14T09:31:45.896Z",
+          "metadata": {
+            "iteration": 45
+          }
+        },
+        {
+          "span_id": "sp-0031-s046",
+          "parent_span_id": "sp-0031-root",
+          "name": "llm.completion",
+          "input": {
+            "i": 46,
+            "action": "llm.completion"
+          },
+          "output": {
+            "i": 46,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:46.026Z",
+          "end": "2026-05-14T09:31:46.027Z",
+          "metadata": {
+            "iteration": 46
+          }
+        },
+        {
+          "span_id": "sp-0031-s047",
+          "parent_span_id": "sp-0031-root",
+          "name": "lookup_kb",
+          "input": {
+            "i": 47,
+            "action": "lookup_kb"
+          },
+          "output": {
+            "i": 47,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:47.157Z",
+          "end": "2026-05-14T09:31:47.158Z",
+          "metadata": {
+            "iteration": 47
+          }
+        },
+        {
+          "span_id": "sp-0031-s048",
+          "parent_span_id": "sp-0031-root",
+          "name": "agent.step",
+          "input": {
+            "i": 48,
+            "action": "agent.step"
+          },
+          "output": {
+            "i": 48,
+            "ok": true
+          },
+          "start": "2026-05-14T09:31:48.288Z",
+          "end": "2026-05-14T09:31:48.289Z",
+          "metadata": {
+            "iteration": 48
+          }
+        },
+        {
+          "_truncated": true,
+          "_dropped": 25
+        }
+      ],
       "scenario_id": "a1c0e031-0b36-4f1a-9c36-000000000031",
       "predicted": "billing",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='sales' output='billing'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e031-0b36-4f1a-9c36-000000000031."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.7,
+          "passed": false,
+          "is_primary": false
+        },
+        "factuality": {
+          "score": 0.6,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='sales' output='billing'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e031-0b36-4f1a-9c36-000000000031."
     },
     {
       "id": "a1c0e034-0b36-4f1a-9c36-000000000034",
@@ -322,18 +1880,32 @@
         "calibrated_confidence": 0.64
       },
       "created": "2026-05-14T09:34:00.000Z",
+      "spans": null,
       "scenario_id": "a1c0e034-0b36-4f1a-9c36-000000000034",
       "predicted": "technical_support",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='general_inquiry' output='technical_support'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e034-0b36-4f1a-9c36-000000000034.",
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.64,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='general_inquiry' output='technical_support'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e034-0b36-4f1a-9c36-000000000034.",
       "metadata": {
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e034-0b36-4f1a-9c36-000000000034"
+        "row_id": "a1c0e034-0b36-4f1a-9c36-000000000034",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       }
     },
     {
@@ -358,16 +1930,118 @@
         "experiment_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "experiment_name": "routing_classifier_eval_v3",
         "project_name": "support-router",
-        "row_id": "a1c0e036-0b36-4f1a-9c36-000000000036"
+        "row_id": "a1c0e036-0b36-4f1a-9c36-000000000036",
+        "agent_revision": "a1b2c3d4e5f67890abcdef1234567890abcdef12"
       },
       "created": "2026-05-14T09:36:00.000Z",
+      "spans": [
+        {
+          "span_id": "sp-0036-root",
+          "parent_span_id": null,
+          "name": "classify_intent",
+          "input": {
+            "message": "Merge my two team accounts into one.",
+            "channel": "email"
+          },
+          "output": {
+            "intent": "cancellation"
+          },
+          "start": "2026-05-14T09:36:00.100Z",
+          "end": "2026-05-14T09:36:00.940Z",
+          "metadata": {
+            "model": "gpt-4o-mini",
+            "step": "root"
+          }
+        },
+        {
+          "span_id": "sp-0036-c0",
+          "parent_span_id": "sp-0036-root",
+          "name": "llm.completion",
+          "input": {
+            "prompt": "Classify the intent of the user message."
+          },
+          "output": {
+            "label": "cancellation",
+            "logprob": -0.42
+          },
+          "start": "2026-05-14T09:36:01.000Z",
+          "end": "2026-05-14T09:36:01.120Z",
+          "metadata": {
+            "tokens_in": 180,
+            "tokens_out": 3
+          }
+        },
+        {
+          "span_id": "sp-0036-c1",
+          "parent_span_id": "sp-0036-root",
+          "name": "lookup_kb",
+          "input": {
+            "query": "Merge my two team accounts into one."
+          },
+          "output": {
+            "hits": 2,
+            "top_doc": "kb/routing.md"
+          },
+          "start": "2026-05-14T09:36:02.000Z",
+          "end": "2026-05-14T09:36:02.120Z",
+          "metadata": {
+            "latency_ms": 35
+          }
+        },
+        {
+          "span_id": "sp-0036-c2",
+          "parent_span_id": "sp-0036-root",
+          "name": "format_response",
+          "input": {
+            "intent": "cancellation"
+          },
+          "output": {
+            "routed_to": "cancellation"
+          },
+          "start": "2026-05-14T09:36:03.000Z",
+          "end": "2026-05-14T09:36:03.120Z",
+          "metadata": {}
+        },
+        {
+          "span_id": "sp-0036-deep",
+          "parent_span_id": "sp-0036-c0",
+          "name": "tool.search",
+          "input": {
+            "q": "kb routing rules"
+          },
+          "output": {
+            "results": [
+              "doc-1",
+              "doc-2"
+            ]
+          },
+          "start": "2026-05-14T09:36:04.000Z",
+          "end": "2026-05-14T09:36:04.080Z",
+          "metadata": {
+            "nested": true,
+            "depth": 2
+          }
+        }
+      ],
       "scenario_id": "a1c0e036-0b36-4f1a-9c36-000000000036",
       "predicted": "cancellation",
       "predicted_confidence": 0.0,
       "passed": false,
       "score": 0.0,
       "scorer": "exact_match",
-      "notes": "Braintrust scorer 'exact_match' scored 0.0 (threshold 1.0). expected='account_management' output='cancellation'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e036-0b36-4f1a-9c36-000000000036."
+      "scorer_signature": {
+        "exact_match": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "calibrated_confidence": {
+          "score": 0.52,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "notes": "Braintrust scorer 'exact_match' scored 0.0 (band [1.0, 1.0]). expected='account_management' output='cancellation'. experiment 'routing_classifier_eval_v3' (f47ac10b-58cc-4372-a567-0e02b2c3d479), row a1c0e036-0b36-4f1a-9c36-000000000036."
     }
   ]
 }
