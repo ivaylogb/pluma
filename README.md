@@ -86,6 +86,8 @@ Connect Pluma to existing analytics platforms and data sources.
 
 - **[Braintrust](src/pluma/integrations/braintrust/)** — convert Braintrust experiment exports into agent-researcher failing-eval input. Field-mapping documented, deterministic converter, golden fixture for diff testing. Filters by primary scorer threshold; preserves the full Braintrust row for diagnostic context. A Braintrust experiment can also be diagnosed directly: `pluma diagnose-agent --target-agent <dir> --braintrust-experiment-id <id> --output-file <md>` (or `--braintrust-project <name> --latest`) pulls it live via the API, converts it, and runs agent-researcher in one command.
 
+- **[GitHub Action template](templates/github-action/)** — drop-in workflow for running Pluma diagnosis on PRs or via webhook. Triggers on Braintrust experiment completion (`repository_dispatch`), manual `workflow_dispatch`, or `workflow_call` from a CI job; posts findings to the PR as a comment or opens an issue. Ships untested against real CI infrastructure — smoke test on a sandbox repo before relying on it.
+
 ## Install
 
 ```bash

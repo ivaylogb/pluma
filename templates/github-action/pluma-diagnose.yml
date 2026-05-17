@@ -1,0 +1,217 @@
+name: Pluma — diagnose eval regression
+
+# When a Braintrust experiment completes (via repository_dispatch from
+# Braintrust's webhook), or on a manual workflow_dispatch, or after a
+# scheduled re-run of the eval, pluma diagnoses any failing scenarios
+# and posts the diagnosis to the triggering PR (or opens an issue if
+# there is no PR). Each finding becomes a suggested-changes block the
+# reviewer can accept directly.
+#
+# Required secrets:
+#   ANTHROPIC_API_KEY      — for the diagnostic agent
+#   BRAINTRUST_API_KEY     — for live experiment pulls
+#
+# Optional repository variables:
+#   PLUMA_TARGET_AGENT_PATH      — path under the repo to the agent
+#                                  source (default: ./agent)
+#   PLUMA_PASS_RATE_THRESHOLD    — minimum pass rate; below this the
+#                                  workflow fails the build
+#                                  (default: 0.95)
+
+on:
+  # Triggered by Braintrust webhook → repository_dispatch.
+  repository_dispatch:
+    types: [braintrust-experiment-completed]
+
+  # Manual fire — handy for testing.
+  workflow_dispatch:
+    inputs:
+      experiment_id:
+        description: "Braintrust experiment ID (overrides repository_dispatch payload)"
+        required: false
+        type: string
+      pr_number:
+        description: "PR to comment on (optional)"
+        required: false
+        type: string
+
+  # After our own CI runs the eval and writes failing_evals.json.
+  workflow_call:
+    inputs:
+      failing_evals_path:
+        description: "Path to failing_evals.json relative to the repo"
+        required: true
+        type: string
+      pr_number:
+        description: "PR number to comment on"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # we need history so we can pin agent_revision
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Pluma
+        run: |
+          python -m pip install --upgrade pip
+          # Pin to a tag in production; main is fine for the example.
+          pip install "pluma @ git+https://github.com/ivaylogb/pluma@main"
+
+      - name: Resolve inputs
+        id: resolve
+        env:
+          DISPATCH_EXPERIMENT_ID: ${{ github.event.client_payload.experiment_id }}
+          DISPATCH_PR_NUMBER: ${{ github.event.client_payload.pr_number }}
+          INPUT_EXPERIMENT_ID: ${{ inputs.experiment_id || github.event.inputs.experiment_id }}
+          INPUT_PR_NUMBER: ${{ inputs.pr_number || github.event.inputs.pr_number }}
+          FAILING_EVALS_PATH: ${{ inputs.failing_evals_path }}
+        run: |
+          # Prefer workflow_dispatch input, then repository_dispatch
+          # payload, then workflow_call input.
+          EXPERIMENT_ID="${INPUT_EXPERIMENT_ID:-$DISPATCH_EXPERIMENT_ID}"
+          PR_NUMBER="${INPUT_PR_NUMBER:-$DISPATCH_PR_NUMBER}"
+
+          if [ -z "$EXPERIMENT_ID" ] && [ -z "$FAILING_EVALS_PATH" ]; then
+            echo "::error::No experiment ID and no failing_evals path provided."
+            exit 1
+          fi
+
+          echo "experiment_id=$EXPERIMENT_ID" >> "$GITHUB_OUTPUT"
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "failing_evals_path=$FAILING_EVALS_PATH" >> "$GITHUB_OUTPUT"
+
+          # Default config from repo variables.
+          TARGET_AGENT="${{ vars.PLUMA_TARGET_AGENT_PATH || './agent' }}"
+          THRESHOLD="${{ vars.PLUMA_PASS_RATE_THRESHOLD || '0.95' }}"
+          echo "target_agent=$TARGET_AGENT" >> "$GITHUB_OUTPUT"
+          echo "pass_rate_threshold=$THRESHOLD" >> "$GITHUB_OUTPUT"
+
+      - name: Pull Braintrust experiment (live mode)
+        if: steps.resolve.outputs.experiment_id != ''
+        env:
+          BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
+        run: |
+          python -m pluma.integrations.braintrust.cli \
+            --braintrust-experiment-id "${{ steps.resolve.outputs.experiment_id }}" \
+            --agent-revision "${{ github.sha }}" \
+            --cluster first \
+            --output /tmp/failing_evals.json
+          echo "FAILING_EVALS=/tmp/failing_evals.json" >> "$GITHUB_ENV"
+
+      - name: Use pre-computed failing_evals.json
+        if: steps.resolve.outputs.experiment_id == '' && steps.resolve.outputs.failing_evals_path != ''
+        run: |
+          cp "${{ steps.resolve.outputs.failing_evals_path }}" /tmp/failing_evals.json
+          echo "FAILING_EVALS=/tmp/failing_evals.json" >> "$GITHUB_ENV"
+
+      - name: Check pass-rate threshold (early exit if clean)
+        id: pass_rate
+        run: |
+          PASS_RATE=$(python -c "import json,sys; print(json.load(open('$FAILING_EVALS'))['pass_rate'])")
+          THRESHOLD="${{ steps.resolve.outputs.pass_rate_threshold }}"
+          echo "pass_rate=$PASS_RATE" >> "$GITHUB_OUTPUT"
+          echo "Pass rate: $PASS_RATE (threshold: $THRESHOLD)"
+          if awk -v pr="$PASS_RATE" -v th="$THRESHOLD" 'BEGIN{exit !(pr+0 >= th+0)}'; then
+            echo "above_threshold=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "above_threshold=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip diagnosis (pass rate above threshold)
+        if: steps.pass_rate.outputs.above_threshold == 'true'
+        run: |
+          echo "Pass rate ${{ steps.pass_rate.outputs.pass_rate }} >= threshold. Nothing to diagnose."
+
+      - name: Run pluma diagnose-agent
+        if: steps.pass_rate.outputs.above_threshold == 'false'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          pluma diagnose-agent \
+            --target-agent "${{ steps.resolve.outputs.target_agent }}" \
+            --eval-result "$FAILING_EVALS" \
+            --output-file /tmp/diagnosis.md
+
+      - name: Upload diagnosis as artifact
+        if: steps.pass_rate.outputs.above_threshold == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pluma-diagnosis
+          path: /tmp/diagnosis.md
+          retention-days: 30
+
+      - name: Post diagnosis to PR
+        if: |
+          steps.pass_rate.outputs.above_threshold == 'false' &&
+          steps.resolve.outputs.pr_number != ''
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.resolve.outputs.pr_number }}
+        with:
+          script: |
+            const fs = require('fs');
+            const diagnosis = fs.readFileSync('/tmp/diagnosis.md', 'utf8');
+            const passRate = '${{ steps.pass_rate.outputs.pass_rate }}';
+            const threshold = '${{ steps.resolve.outputs.pass_rate_threshold }}';
+            const body = [
+              `## 🪶 Pluma diagnosis`,
+              ``,
+              `Eval pass rate: **${passRate}** (threshold ${threshold}).`,
+              ``,
+              `<details><summary>Full diagnosis</summary>`,
+              ``,
+              diagnosis,
+              ``,
+              `</details>`,
+              ``,
+              `_Generated by [pluma](https://github.com/ivaylogb/pluma) at \`${context.sha.slice(0,7)}\`._`,
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt(process.env.PR_NUMBER, 10),
+              body,
+            });
+
+      - name: Open an issue when there is no PR
+        if: |
+          steps.pass_rate.outputs.above_threshold == 'false' &&
+          steps.resolve.outputs.pr_number == ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const diagnosis = fs.readFileSync('/tmp/diagnosis.md', 'utf8');
+            const passRate = '${{ steps.pass_rate.outputs.pass_rate }}';
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Eval regression — pass rate ${passRate}`,
+              body: diagnosis,
+              labels: ['pluma-diagnosis', 'eval-regression'],
+            });
+
+      - name: Fail the build if regression is severe
+        if: steps.pass_rate.outputs.above_threshold == 'false'
+        run: |
+          # Soft-fail: an eval regression below the threshold is a
+          # red CI signal so the PR author actually sees it. Comment
+          # out the next line for a non-blocking advisory mode.
+          exit 1
