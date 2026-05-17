@@ -27,7 +27,10 @@ import json
 import sys
 from pathlib import Path
 
-from .braintrust_client import BraintrustAPIError, BraintrustClient
+from .braintrust_client import (
+    BraintrustAPIError,
+    fetch_experiment_as_failing_evals,
+)
 from .experiment_to_failing_evals import (
     DEFAULT_MAX_SPANS,
     ScoreBand,
@@ -157,12 +160,9 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def _load_experiment(args: argparse.Namespace) -> dict:
-    """Resolve the input source and return an experiment dict.
-
-    Exactly one of (--input, --braintrust-experiment-id,
-    --braintrust-project) must be set.
-    """
+def _validate_source(args: argparse.Namespace) -> None:
+    """Exactly one of (--input, --braintrust-experiment-id,
+    --braintrust-project) must be set."""
     sources = [
         bool(args.input),
         bool(args.braintrust_experiment_id),
@@ -174,37 +174,10 @@ def _load_experiment(args: argparse.Namespace) -> dict:
             "--braintrust-experiment-id, --braintrust-project."
         )
 
-    if args.input:
-        return json.loads(Path(args.input).read_text())
-
-    client = BraintrustClient()
-    experiment_id = client.resolve_experiment_id(
-        experiment_id=args.braintrust_experiment_id,
-        project=args.braintrust_project,
-        experiment_name=args.braintrust_experiment_name,
-        latest=args.latest,
-    )
-    return client.fetch_experiment_export(
-        experiment_id,
-        with_spans=not args.no_spans,
-    )
-
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-
-    try:
-        experiment = _load_experiment(args)
-    except BraintrustAPIError as e:
-        print(
-            f"Braintrust API error: {e}",
-            file=sys.stderr,
-        )
-        if e.status:
-            print(f"  status: {e.status}", file=sys.stderr)
-        if e.body:
-            print(f"  body: {e.body[:500]}", file=sys.stderr)
-        return 3
+    _validate_source(args)
 
     band = ScoreBand(
         min_score=args.score_threshold,
@@ -217,18 +190,46 @@ def main(argv: list[str] | None = None) -> int:
 
     max_spans = None if args.max_spans == -1 else args.max_spans
 
-    container = experiment_to_failing_evals(
-        experiment,
-        primary_scorer=args.scorer,
-        score_band=band,
-        agent_revision=args.agent_revision,
-        max_spans=max_spans,
-    )
-
-    if args.cluster != "none":
-        container = cluster_failing_rows(
-            container, representative=args.cluster
+    try:
+        if args.input:
+            # File mode: load the saved export, then convert/cluster here.
+            experiment = json.loads(Path(args.input).read_text())
+            container = experiment_to_failing_evals(
+                experiment,
+                primary_scorer=args.scorer,
+                score_band=band,
+                agent_revision=args.agent_revision,
+                max_spans=max_spans,
+            )
+            if args.cluster != "none":
+                container = cluster_failing_rows(
+                    container, representative=args.cluster
+                )
+        else:
+            # Live mode: resolve→fetch→convert→cluster via the shared
+            # helper Pluma's diagnose-agent router also calls.
+            container = fetch_experiment_as_failing_evals(
+                experiment_id=args.braintrust_experiment_id,
+                project=args.braintrust_project,
+                experiment_name=args.braintrust_experiment_name,
+                latest=args.latest,
+                with_spans=not args.no_spans,
+                scorer=args.scorer,
+                score_band=band,
+                agent_revision=args.agent_revision,
+                max_spans=max_spans,
+                cluster=args.cluster,
+            )
+    except BraintrustAPIError as e:
+        print(
+            f"Braintrust API error: {e}",
+            file=sys.stderr,
         )
+        if e.status:
+            print(f"  status: {e.status}", file=sys.stderr)
+        if e.body:
+            print(f"  body: {e.body[:500]}", file=sys.stderr)
+        return 3
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

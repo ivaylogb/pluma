@@ -29,6 +29,13 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any, Iterator
 
+from .experiment_to_failing_evals import (
+    DEFAULT_MAX_SPANS,
+    ScoreBand,
+    cluster_failing_rows,
+    experiment_to_failing_evals,
+)
+
 DEFAULT_BASE_URL = "https://api.braintrust.dev/v1"
 DEFAULT_TIMEOUT_S = 30
 DEFAULT_PAGE_LIMIT = 100
@@ -255,8 +262,74 @@ class BraintrustClient:
         }
 
 
+# --------------------------------------------------------------------------
+# Live fetch → failing-evals container (shared dispatch)
+# --------------------------------------------------------------------------
+#
+# The standalone CLI's live mode and Pluma's ``diagnose-agent`` router both
+# need the same thing: resolve flags to an experiment, pull it (with spans),
+# run the converter, optionally cluster, hand back the container the
+# agent-researcher loader consumes. Factored here so neither caller
+# reimplements the resolve→fetch→convert→cluster sequence. Pure data in,
+# container dict out — no argparse, no stdout. ``BraintrustAPIError``
+# propagates; each caller renders it the way its own UX wants.
+
+
+def fetch_experiment_as_failing_evals(
+    *,
+    experiment_id: str | None = None,
+    project: str | None = None,
+    experiment_name: str | None = None,
+    latest: bool = False,
+    api_key: str | None = None,
+    base_url: str = DEFAULT_BASE_URL,
+    with_spans: bool = True,
+    scorer: str | None = None,
+    score_band: ScoreBand | None = None,
+    agent_revision: str | None = None,
+    max_spans: int | None = DEFAULT_MAX_SPANS,
+    cluster: str = "none",
+) -> dict:
+    """Resolve, fetch, convert and (optionally) cluster a live experiment.
+
+    Returns the single JSON object ``agent_researcher.eval_analyzer.
+    load_eval_result`` consumes — identical in shape to a saved
+    ``failing_evals.json``, so the caller can drop it straight onto disk
+    or feed it through the loader.
+
+    ``score_band`` defaults to ``ScoreBand()`` (strict 1.0). ``max_spans``
+    carries the converter's own contract verbatim: an int trims to that
+    many spans, ``None`` disables trimming, and the default is
+    ``DEFAULT_MAX_SPANS``. ``cluster`` is one of ``"none"`` / ``"first"``
+    / ``"worst"``.
+    """
+    client = BraintrustClient(api_key=api_key, base_url=base_url)
+    resolved_id = client.resolve_experiment_id(
+        experiment_id=experiment_id,
+        project=project,
+        experiment_name=experiment_name,
+        latest=latest,
+    )
+    experiment = client.fetch_experiment_export(
+        resolved_id, with_spans=with_spans
+    )
+
+    band = score_band if score_band is not None else ScoreBand()
+    container = experiment_to_failing_evals(
+        experiment,
+        primary_scorer=scorer,
+        score_band=band,
+        agent_revision=agent_revision,
+        max_spans=max_spans,
+    )
+    if cluster and cluster != "none":
+        container = cluster_failing_rows(container, representative=cluster)
+    return container
+
+
 __all__ = [
     "BraintrustAPIError",
     "BraintrustClient",
     "DEFAULT_BASE_URL",
+    "fetch_experiment_as_failing_evals",
 ]

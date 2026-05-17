@@ -24,7 +24,10 @@ Exit-code union (preserves agent-researcher's 6/7/8 for its apply flow):
 from __future__ import annotations
 
 import argparse
+import json
+import os
 import sys
+import tempfile
 from pathlib import Path
 from typing import Optional
 
@@ -32,6 +35,15 @@ from . import __version__
 from . import cache as cache_mod
 from . import router as router_mod
 from . import runners
+from .integrations.braintrust.braintrust_client import (
+    DEFAULT_BASE_URL as BRAINTRUST_DEFAULT_BASE_URL,
+    BraintrustAPIError,
+    fetch_experiment_as_failing_evals,
+)
+from .integrations.braintrust.experiment_to_failing_evals import (
+    DEFAULT_MAX_SPANS,
+    ScoreBand,
+)
 
 # Sister-tool dispatch table for `apply` / `iterate`.
 _APPLY_RUNNERS = {
@@ -96,7 +108,11 @@ def _build_parser() -> argparse.ArgumentParser:
 
     # diagnose-agent
     p = subs.add_parser("diagnose-agent", help="agent-researcher diagnose")
-    _add_agent_diagnose_flags(p)
+    # --eval-result becomes one of several sources (the other being a live
+    # Braintrust experiment), so argparse no longer hard-requires it; the
+    # handler validates that exactly one source is present.
+    _add_agent_diagnose_flags(p, eval_result_required=False)
+    _add_braintrust_source_flags(p)
 
     # watch
     p = subs.add_parser("watch", help="integration-watcher watch")
@@ -164,10 +180,19 @@ def _add_funnel_diagnose_flags(p: argparse.ArgumentParser, *, required: bool = T
 
 
 def _add_agent_diagnose_flags(
-    p: argparse.ArgumentParser, *, required: bool = True, skip_output: bool = False
+    p: argparse.ArgumentParser,
+    *,
+    required: bool = True,
+    skip_output: bool = False,
+    eval_result_required: bool = True,
 ) -> None:
     p.add_argument("--target-agent", type=Path, required=required)
-    p.add_argument("--eval-result", type=Path, required=required)
+    p.add_argument(
+        "--eval-result",
+        type=Path,
+        required=required and eval_result_required,
+        help="agent-researcher failing-eval JSON (file source).",
+    )
     p.add_argument("--scenario-id", type=str, default=None)
     p.add_argument("--scenario-input", type=str, default=None)
     p.add_argument("--scenario-input-file", type=Path, default=None)
@@ -177,6 +202,85 @@ def _add_agent_diagnose_flags(
     if not p._has_action("--no-cache"):
         p.add_argument("--no-cache", action="store_true")
         p.add_argument("--force", action="store_true")
+
+
+def _add_braintrust_source_flags(p: argparse.ArgumentParser) -> None:
+    """Live-Braintrust source for diagnose-agent.
+
+    These substitute for --eval-result: instead of a saved failing-eval
+    file, the experiment is pulled from the Braintrust API, converted, and
+    fed to agent-researcher. The handler enforces that exactly one source
+    (file or Braintrust) is given. The shaping flags mirror the standalone
+    braintrust CLI so behavior is identical on either entry point.
+    """
+    g = p.add_argument_group("braintrust source (alternative to --eval-result)")
+    g.add_argument(
+        "--braintrust-experiment-id",
+        type=str,
+        default=None,
+        help="Diagnose this Braintrust experiment, pulled live via the API.",
+    )
+    g.add_argument(
+        "--braintrust-project",
+        type=str,
+        default=None,
+        help="Braintrust project to pull from; pair with --latest.",
+    )
+    g.add_argument(
+        "--latest",
+        action="store_true",
+        help="With --braintrust-project, use the project's most recent experiment.",
+    )
+    g.add_argument(
+        "--braintrust-api-key",
+        type=str,
+        default=None,
+        help="Braintrust API key. Falls back to the BRAINTRUST_API_KEY env var.",
+    )
+    g.add_argument(
+        "--braintrust-base-url",
+        type=str,
+        default=BRAINTRUST_DEFAULT_BASE_URL,
+        help=f"Braintrust API base URL (default: {BRAINTRUST_DEFAULT_BASE_URL}).",
+    )
+    g.add_argument(
+        "--scorer",
+        type=str,
+        default=None,
+        help="Primary scorer name. Defaults to each row's first scorer.",
+    )
+    g.add_argument(
+        "--score-band-min",
+        type=float,
+        default=1.0,
+        help="Minimum passing score for the primary scorer (default: 1.0).",
+    )
+    g.add_argument(
+        "--score-band-max",
+        type=float,
+        default=None,
+        help="Maximum passing score for the primary scorer (default: the min, "
+        "or 1.0). A band rejects over-confident rows for calibration scorers.",
+    )
+    g.add_argument(
+        "--max-spans",
+        type=int,
+        default=DEFAULT_MAX_SPANS,
+        help=f"Trim each row's spans to at most this many (default: "
+        f"{DEFAULT_MAX_SPANS}). Pass -1 to disable trimming.",
+    )
+    g.add_argument(
+        "--cluster",
+        choices=("none", "first", "worst"),
+        default="none",
+        help="Collapse failing rows that share a failure shape into one "
+        "representative ('first' or 'worst' by score). Default: none.",
+    )
+    g.add_argument(
+        "--no-cluster",
+        action="store_true",
+        help="Force clustering off (overrides --cluster).",
+    )
 
 
 def _add_watch_flags(p: argparse.ArgumentParser) -> None:
@@ -231,6 +335,28 @@ def _run_explicit(args: argparse.Namespace, sub: str) -> int:
             ),
         )
     if route.tool == "agent-researcher":
+        # `getattr` defaults keep the inferred-`diagnose` re-dispatch (which
+        # reuses this branch with a parser that has no Braintrust flags)
+        # working unchanged.
+        bt_exp = getattr(args, "braintrust_experiment_id", None)
+        bt_proj = getattr(args, "braintrust_project", None)
+        bt_latest = getattr(args, "latest", False)
+        eval_result = getattr(args, "eval_result", None)
+        live = bool(bt_exp or bt_proj)
+
+        err = _validate_agent_source(
+            eval_result=eval_result,
+            bt_exp=bt_exp,
+            bt_proj=bt_proj,
+            bt_latest=bt_latest,
+        )
+        if err is not None:
+            print(err, file=sys.stderr)
+            return 2
+
+        if live:
+            return _run_agent_diagnose_live(args)
+
         return _wrap_cache(
             tool="agent-researcher",
             inputs=[
@@ -274,6 +400,112 @@ def _run_explicit(args: argparse.Namespace, sub: str) -> int:
             ),
         )
     return 2  # unreachable
+
+
+def _validate_agent_source(
+    *,
+    eval_result: Optional[Path],
+    bt_exp: Optional[str],
+    bt_proj: Optional[str],
+    bt_latest: bool,
+) -> Optional[str]:
+    """Enforce the diagnose-agent source rules. Returns an error string to
+    print (caller exits 2) or None when the flags are coherent.
+
+    Order matters: the most specific conflict wins, so a stray --latest or
+    a project without --latest gets a precise message instead of the
+    generic "no source" one.
+    """
+    if (bt_exp or bt_proj) and eval_result is not None:
+        return (
+            "diagnose-agent: --eval-result and the --braintrust-* flags are "
+            "mutually exclusive — pass a file source or a Braintrust source, "
+            "not both."
+        )
+    if bt_exp and bt_proj:
+        return (
+            "diagnose-agent: --braintrust-experiment-id and "
+            "--braintrust-project are mutually exclusive."
+        )
+    if bt_proj and not bt_latest:
+        return (
+            "diagnose-agent: --braintrust-project requires --latest "
+            "(project + named-experiment mode is not exposed here yet)."
+        )
+    if bt_latest and not bt_proj:
+        return "diagnose-agent: --latest requires --braintrust-project."
+    if not (bt_exp or bt_proj) and eval_result is None:
+        return (
+            "diagnose-agent requires a source: --eval-result FILE, or "
+            "--braintrust-experiment-id ID, or --braintrust-project NAME "
+            "--latest."
+        )
+    return None
+
+
+def _run_agent_diagnose_live(args: argparse.Namespace) -> int:
+    """Pull a Braintrust experiment, convert it, and run agent-researcher.
+
+    The converted container is the same JSON shape agent-researcher's
+    loader reads from --eval-result, so it is staged to a temp file and
+    fed through the existing runner unchanged. The Braintrust path does
+    not use the input-hash cache: a live pull is keyed on an experiment
+    id, not file contents, and the temp path is per-run, so a cache entry
+    could never hit. --no-cache/--force are therefore inert here.
+    """
+    band = ScoreBand(
+        min_score=args.score_band_min,
+        max_score=(
+            args.score_band_max
+            if args.score_band_max is not None
+            else max(args.score_band_min, 1.0)
+        ),
+    )
+    max_spans = None if args.max_spans == -1 else args.max_spans
+    cluster = "none" if args.no_cluster else args.cluster
+
+    try:
+        container = fetch_experiment_as_failing_evals(
+            experiment_id=args.braintrust_experiment_id,
+            project=args.braintrust_project,
+            latest=args.latest,
+            api_key=args.braintrust_api_key,
+            base_url=args.braintrust_base_url,
+            scorer=args.scorer,
+            score_band=band,
+            max_spans=max_spans,
+            cluster=cluster,
+        )
+    except BraintrustAPIError as e:
+        print(f"Braintrust API error: {e}", file=sys.stderr)
+        if e.status:
+            print(f"  status: {e.status}", file=sys.stderr)
+        if e.body:
+            print(f"  body: {e.body[:500]}", file=sys.stderr)
+        return 3
+
+    tmp = tempfile.NamedTemporaryFile(
+        "w", suffix=".json", delete=False, encoding="utf-8"
+    )
+    try:
+        json.dump(container, tmp)
+        tmp.flush()
+        tmp.close()
+        result = runners.agent_diagnose(
+            target_agent=args.target_agent,
+            eval_result=Path(tmp.name),
+            output_file=args.output_file,
+            scenario_id=args.scenario_id,
+            scenario_input=args.scenario_input,
+            scenario_input_file=args.scenario_input_file,
+            model=args.model,
+        )
+    finally:
+        try:
+            os.unlink(tmp.name)
+        except OSError:
+            pass
+    return result.exit_code
 
 
 def _run_inferred(args: argparse.Namespace, *, verb: str) -> int:
