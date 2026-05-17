@@ -184,6 +184,69 @@ def test_post_1_21_attribute_names_recognized():
     assert pre == post == _EXPECTED
 
 
+def test_otlp_proto3_strict_string_status_recognized():
+    """Strict proto3-JSON OTLP encodes int64 as JSON strings (status
+    codes; timestamps were already string-encoded in this fixture
+    family). The converter must accept that shape and produce the same
+    output as the numeric-encoded equivalent — not silently zero the
+    status.
+
+    This guards the divergence documented at the top of
+    ``otel_to_traces.py``: reverting to the bundle's original
+    ``isinstance(status, (int, float))`` gate would zero ``"200"``
+    and fail this test. ``latency_ms`` is asserted too, proving the
+    string ``*UnixNano`` fields parse end-to-end (they already did via
+    ``int()`` in ``_nanos_to_iso`` / ``_latency_ms_from_otlp``; status
+    was the only hard gate, but the assertion documents the contract).
+    """
+    attrs = {
+        "enduser.id": "dev_kilo",
+        "http.request.method": "GET",
+        "url.path": "/v1/items",
+        "http.response.status_code": 200,  # -> "200" in strict encoding
+    }
+
+    def _otlp_one(int_as_string: bool) -> dict:
+        def _val(v):
+            if isinstance(v, int):
+                return {"intValue": str(v) if int_as_string else v}
+            return {"stringValue": v}
+
+        return {"resourceSpans": [{"resource": {"attributes": []},
+                "scopeSpans": [{"spans": [{
+                    "traceId": "a" * 32, "spanId": "b" * 16,
+                    # proto3-strict int64 nanos: JSON strings.
+                    "startTimeUnixNano": "1778835600000000000",
+                    "endTimeUnixNano": "1778835600250000000",
+                    "attributes": [
+                        {"key": k, "value": _val(v)}
+                        for k, v in attrs.items()
+                    ],
+                }]}]}]}
+
+    strict = otel_to_traces(_otlp_one(int_as_string=True))[0].as_dict()
+    numeric = otel_to_traces(_otlp_one(int_as_string=False))[0].as_dict()
+
+    # The fix: a string-encoded status is no longer zeroed.
+    assert strict["response_status"] == 200
+    # String nanos parse end-to-end: 250ms, ISO-second timestamp.
+    assert strict["latency_ms"] == 250
+    assert strict["timestamp"] == "2026-05-15T09:00:00Z"
+    # Strict and numeric encodings converge byte-for-byte.
+    assert strict == numeric
+
+    # The committed fixture carries a proto3-strict developer; its
+    # statuses must survive the converter, not collapse to 0.
+    kilo = [
+        r for r in otel_to_traces(
+            json.loads((_FIX / "traces.json").read_text())
+        )
+        if r.developer_id == "dev_kilo"
+    ]
+    assert [r.response_status for r in kilo] == [200, 200, 503, 503, 200]
+    assert all(r.response_status != 0 for r in kilo)
+
+
 # =========================================================================
 # auto-detection
 # =========================================================================
@@ -199,7 +262,9 @@ def test_format_auto_detection():
     assert _detect_walker(bare) is _walk_bare
 
     # And each fixture actually converts via its detected path.
-    assert len(otel_to_traces(otlp)) == 46
+    # (51 = 46 original HTTP records + 5 for the proto3-strict
+    # dev_kilo added by the string-status follow-up patch.)
+    assert len(otel_to_traces(otlp)) == 51
     assert len(otel_to_traces(jaeger)) == 6
     assert len(otel_to_traces(bare)) == 8
 
@@ -285,11 +350,13 @@ def test_round_trip_through_integration_watcher_loader(tmp_path):
 
     traces = loaders.load_traces(out)  # must not raise
     src_records = otel_to_traces(json.loads((_FIX / "traces.json").read_text()))
-    assert len(traces) == len(src_records) == 46
+    # 51 = 46 original + 5 for proto3-strict dev_kilo (additive patch);
+    # 8 developers = original 7 + dev_kilo.
+    assert len(traces) == len(src_records) == 51
 
     cohort = analyzer.analyze_cohort(traces)
-    assert cohort.developer_count == 7
-    assert cohort.total_calls == 46
+    assert cohort.developer_count == 8
+    assert cohort.total_calls == 51
     # The "stuck in a 401 loop" pattern must survive the conversion.
     bravo = next(i for i in cohort.integrations
                  if i.developer_id == "dev_bravo")

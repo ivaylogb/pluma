@@ -44,3 +44,8 @@
 {"timestamp":"2026-05-15T09:02:34Z","developer_id":"dev_golf","endpoint":"GET /v1/projects","request_summary":"page=2&limit=50","response_status":200,"error_code":null,"latency_ms":115}
 {"timestamp":"2026-05-15T09:02:37Z","developer_id":"dev_golf","endpoint":"GET /v1/projects","request_summary":"page=3&limit=50","response_status":200,"error_code":null,"latency_ms":120}
 {"timestamp":"2026-05-15T09:02:40Z","developer_id":"dev_golf","endpoint":"GET /v1/search","request_summary":"q=onboarding&type=doc","response_status":200,"error_code":null,"latency_ms":130}
+{"timestamp":"2026-05-15T09:02:46Z","developer_id":"dev_kilo","endpoint":"POST /v1/auth/token","request_summary":"content-type=application/json","response_status":200,"error_code":null,"latency_ms":175}
+{"timestamp":"2026-05-15T09:02:50Z","developer_id":"dev_kilo","endpoint":"GET /v1/projects","request_summary":"","response_status":200,"error_code":null,"latency_ms":92}
+{"timestamp":"2026-05-15T09:02:53Z","developer_id":"dev_kilo","endpoint":"GET /v1/projects/proj_kilo/items","request_summary":"","response_status":503,"error_code":"503","latency_ms":880}
+{"timestamp":"2026-05-15T09:02:57Z","developer_id":"dev_kilo","endpoint":"GET /v1/projects/proj_kilo/items","request_summary":"","response_status":503,"error_code":"503","latency_ms":910}
+{"timestamp":"2026-05-15T09:03:00Z","developer_id":"dev_kilo","endpoint":"GET /v1/projects/proj_kilo/items","request_summary":"","response_status":200,"error_code":null,"latency_ms":140}

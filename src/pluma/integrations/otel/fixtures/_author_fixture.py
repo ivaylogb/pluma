@@ -83,6 +83,23 @@ def _otlp_attrs(pairs: dict) -> list[dict]:
     return out
 
 
+def _otlp_attrs_strict(pairs: dict) -> list[dict]:
+    """Encode like ``_otlp_attrs`` but in spec-compliant proto3-JSON:
+    int64 (intValue) is serialized as a JSON *string*, not a number.
+    This is the shape strict OTLP/JSON exporters emit; the converter
+    must accept it. Used only by the proto3-strict scenario so existing
+    developers' spans stay byte-identical."""
+    out: list[dict] = []
+    for k, v in pairs.items():
+        if isinstance(v, bool):
+            out.append({"key": k, "value": {"boolValue": v}})
+        elif isinstance(v, int):
+            out.append({"key": k, "value": {"intValue": str(v)}})
+        else:
+            out.append({"key": k, "value": {"stringValue": str(v)}})
+    return out
+
+
 # --- the scenario -------------------------------------------------------
 #
 # Each developer: (developer_id, convention, [calls]). A call is
@@ -171,6 +188,26 @@ _SCENARIO: list[tuple[str, str, list[tuple]]] = [
             ("GET", "/v1/projects?page=2&limit=50", 200, 115, None),
             ("GET", "/v1/projects?page=3&limit=50", 200, 120, None),
             ("GET", "/v1/search?q=onboarding&type=doc", 200, 130, None),
+        ],
+    ),
+]
+
+# Proto3-strict variant. Same call/convention shape as the developers
+# above, but its spans are encoded with string int64s (intValue as a
+# JSON string) — the spec-compliant OTLP/JSON form. Appended after the
+# main scenario so every existing developer's span bytes are unchanged;
+# this case exercises the converter's string-status acceptance (the
+# divergence documented at the top of otel_to_traces.py). post-1.21
+# attribute names, one 200, one repeated 503, a recovery.
+_PROTO3_STRICT_SCENARIO: list[tuple[str, str, list[tuple]]] = [
+    (
+        "dev_kilo", "post",
+        [
+            ("POST", "/v1/auth/token", 200, 175, None),
+            ("GET", "/v1/projects", 200, 92, None),
+            ("GET", "/v1/projects/proj_kilo/items", 503, 880, "503"),
+            ("GET", "/v1/projects/proj_kilo/items", 503, 910, "503"),
+            ("GET", "/v1/projects/proj_kilo/items", 200, 140, None),
         ],
     ),
 ]
@@ -284,6 +321,60 @@ def _build_otlp() -> dict:
             })
             clock = end + gap_ns
         clock += gap_ns  # spacing between developers
+
+    # Proto3-strict developers, appended last so the spans above are
+    # byte-identical to the pre-patch fixture. Identical span structure;
+    # only the attribute encoding differs (string int64s).
+    for dev_id, convention, calls in _PROTO3_STRICT_SCENARIO:
+        trace_id = _hex(f"trace::{dev_id}", 32)
+        root_id = _hex(f"span::{dev_id}::root", 16)
+        spans.append({
+            "traceId": trace_id,
+            "spanId": root_id,
+            "name": f"integration.session {dev_id}",
+            "kind": 1,
+            "startTimeUnixNano": str(clock),
+            "endTimeUnixNano": str(clock + 2_000_000_000),
+            "attributes": _otlp_attrs_strict({
+                "enduser.id": dev_id,
+                "session.kind": "developer-integration",
+            }),
+            "status": {"code": 0},
+        })
+        spans.append({
+            "traceId": trace_id,
+            "spanId": _hex(f"span::{dev_id}::db", 16),
+            "parentSpanId": root_id,
+            "name": "SELECT api_key",
+            "kind": 3,
+            "startTimeUnixNano": str(clock + 1_000_000),
+            "endTimeUnixNano": str(clock + 4_000_000),
+            "attributes": _otlp_attrs_strict({
+                "db.system": "postgresql",
+                "db.statement": "SELECT id FROM api_key WHERE token=$1",
+            }),
+            "status": {"code": 0},
+        })
+        for idx, (method, path, status, latency_ms, error) in enumerate(calls):
+            start = clock
+            end = start + latency_ms * 1_000_000
+            spans.append({
+                "traceId": trace_id,
+                "spanId": _hex(f"span::{dev_id}::{idx}", 16),
+                "parentSpanId": root_id,
+                "name": f"{method} {_split_path_query(path)[0]}",
+                "kind": 3,
+                # proto3-strict: int64 nanos as JSON strings (already
+                # the case) AND intValue status as a JSON string.
+                "startTimeUnixNano": str(start),
+                "endTimeUnixNano": str(end),
+                "attributes": _otlp_attrs_strict(
+                    _http_attrs(convention, dev_id, method, path, status, error)
+                ),
+                "status": {"code": 2 if status >= 400 else 0},
+            })
+            clock = end + gap_ns
+        clock += gap_ns
 
     return {
         "resourceSpans": [
