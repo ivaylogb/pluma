@@ -39,11 +39,15 @@ same recognized fields and the same failing-row set as before.
   a failure shape into one representative, so diagnosing one systemic cause
   across 30 rows costs one investigation, not 30.
 
-`cli.py` also carries live-API flags (`--braintrust-experiment-id`,
-`--braintrust-project`, `--latest`, …) backed by `braintrust_client.py`.
-These are not yet wired into Pluma's main router (`pluma diagnose-agent`);
-that router glue is separate follow-up work. File mode (`--input`) is the
-supported path today.
+Live mode skips the export-to-disk step. `--braintrust-experiment-id ID`
+(or `--braintrust-project NAME --latest`) pulls the experiment from the
+Braintrust API, enriches rows with spans, and converts inline. It is
+reachable two ways, both backed by the same
+`braintrust_client.fetch_experiment_as_failing_evals` helper (resolve →
+fetch → convert → optional cluster, pure data in / container out):
+
+- `python -m pluma.integrations.braintrust.cli --braintrust-experiment-id ID --output …` — write the converted file.
+- `pluma diagnose-agent --braintrust-experiment-id ID …` — pull, convert, and run agent-researcher in one command (see Usage).
 
 ### Field mapping
 
@@ -169,7 +173,7 @@ A failing record in `fixtures/failing_evals.json`, with the new fields
 }
 ```
 
-Point agent-researcher at the converted output (directly or via Pluma):
+Point agent-researcher at a converted file (directly or via Pluma):
 
 ```bash
 pluma diagnose-agent \
@@ -177,6 +181,30 @@ pluma diagnose-agent \
     --eval-result  src/pluma/integrations/braintrust/fixtures/failing_evals.json \
     --output-file   hypotheses.md
 ```
+
+Or skip the file entirely — pull the experiment live, convert, and
+diagnose in one command (`BRAINTRUST_API_KEY` in the env, or
+`--braintrust-api-key`):
+
+```bash
+pluma diagnose-agent \
+    --target-agent your_agent_dir \
+    --braintrust-experiment-id <experiment-id> \
+    --output-file   hypotheses.md
+
+# or the most recent experiment in a project
+pluma diagnose-agent \
+    --target-agent your_agent_dir \
+    --braintrust-project <project-name> --latest \
+    --output-file   hypotheses.md
+```
+
+`--eval-result` and the `--braintrust-*` flags are mutually exclusive
+(exactly one source). The shaping flags carry through to the converter:
+`--scorer`, `--score-band-min`, `--score-band-max`, `--max-spans`,
+`--cluster {none,first,worst}` / `--no-cluster`. The live path pulls
+spans by default and does not use Pluma's run cache (a live pull is keyed
+on an experiment id, not file contents).
 
 ## Filtering behavior
 

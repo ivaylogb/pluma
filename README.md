@@ -82,7 +82,7 @@ Connect Pluma to existing analytics platforms and data sources.
 
 - **[PostHog](src/pluma/integrations/posthog/)** — convert PostHog event exports into integration-watcher trace input. Field-mapping documented, deterministic converter, golden fixture for diff testing. Roadmap covers a live API client, funnel converter, and writing Pluma findings back as PostHog annotations.
 
-- **[Braintrust](src/pluma/integrations/braintrust/)** — convert Braintrust experiment exports into agent-researcher failing-eval input. Field-mapping documented, deterministic converter, golden fixture for diff testing. Filters by primary scorer threshold; preserves the full Braintrust row for diagnostic context.
+- **[Braintrust](src/pluma/integrations/braintrust/)** — convert Braintrust experiment exports into agent-researcher failing-eval input. Field-mapping documented, deterministic converter, golden fixture for diff testing. Filters by primary scorer threshold; preserves the full Braintrust row for diagnostic context. A Braintrust experiment can also be diagnosed directly: `pluma diagnose-agent --target-agent <dir> --braintrust-experiment-id <id> --output-file <md>` (or `--braintrust-project <name> --latest`) pulls it live via the API, converts it, and runs agent-researcher in one command.
 
 ## Install
 
