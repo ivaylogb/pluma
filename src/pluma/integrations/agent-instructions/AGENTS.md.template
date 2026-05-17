@@ -1,0 +1,349 @@
+# AGENTS.md
+
+This file gives the agent (Codex CLI) persistent context for this project.
+Customize the project-specific sections below; the "Pluma diagnostic tools"
+section is ready to use as-is.
+
+## Project overview
+
+<!-- Replace with a brief description of your project. -->
+
+## Coding conventions
+
+<!-- Add your project's coding conventions here. -->
+
+## Pluma diagnostic tools
+
+This project uses Pluma's diagnostic tools for figuring out why an
+LLM-mediated system failed. Four tools are available; each has a specific use
+case. Invoke them via shell when the trigger conditions match.
+
+### agent-researcher
+
+`agent-researcher` diagnoses one failing eval scenario. Given the target
+agent's directory and the harness output containing the failure, it reads the
+agent's source and the failing scenario, then produces a markdown report of
+2–3 structurally distinct hypotheses about why the failure happened. Each
+hypothesis is assigned to one agent-engineering layer (Evaluation, Tools,
+Context, Workflow), cites specific `file:line` evidence in the target agent,
+ships an applyable structured edit, and names a verification step. The
+diagnostic logic lives in the CLI; you invoke the CLI through your shell and
+relay what it produced.
+
+#### When to invoke
+
+Invoke when a scenario in an eval suite is failing, the user wants to
+understand why, and the eval output is available as a JSON file — for example
+an export from Braintrust, LangSmith, or a custom harness. The user typically
+says something like *"the routing eval is failing on scenario 107, figure out
+why."* This is the trigger: a known failing scenario, an agent under
+diagnosis, and a request for structured hypotheses rather than a guess.
+
+Do not invoke for green eval suites, for "make the agent better" with no
+specific failure, or when no eval-result JSON exists.
+
+#### Prerequisites
+
+- The `agent-researcher` CLI on PATH. Install from a clone of
+  <https://github.com/ivaylogb/agent-researcher>:
+  ```bash
+  pip install -e .
+  export ANTHROPIC_API_KEY=sk-ant-...
+  ```
+- `ANTHROPIC_API_KEY` set — `diagnose` spends model tokens.
+
+#### Inputs
+
+| Input | Flag | Required | Notes |
+|---|---|---|---|
+| Target agent directory | `--target-agent` | yes | The agent under diagnosis (manifest, prompts, tools). |
+| Eval result JSON | `--eval-result` | yes | The harness output containing the failure. |
+| Scenario id | `--scenario-id` | no | Which failure to investigate; defaults to the first. |
+| Scenario input | `--scenario-input` / `--scenario-input-file` | no | The user message for the failing scenario. Strongly improves the report. |
+| Model | `--model` | no | Claude model override. |
+| Output path | `--output-file` | no | Where to write the report. See Outputs. |
+
+#### Outputs
+
+A markdown hypotheses report. Pass `--output-file ./hypotheses.md` (or a
+scenario-specific name) so the report is captured to a file; without
+`--output-file` the CLI writes the report to stdout. After it completes, read
+that file back and surface the hypotheses to the user — each with its layer,
+`file:line` citation, proposed edit, and verification step.
+
+#### Invocation
+
+Run the installed CLI directly through your shell:
+
+```bash
+agent-researcher diagnose \
+    --target-agent ./reference_agent \
+    --eval-result ./reference_agent/evals/routing/last_run.json \
+    --scenario-id 107 \
+    --scenario-input-file ./scenario_107.txt \
+    --output-file ./hypotheses_107.md
+```
+
+Then read `./hypotheses_107.md` and present the hypotheses, each with its
+layer, `file:line` citation, proposed edit, and verification step.
+
+#### What this tool does not do
+
+- It does not apply edits or re-run the eval. That is the CLI's `apply` /
+  `iterate`; do not invoke those as part of diagnosis.
+- It does not invent hypotheses itself — relay what the CLI produced.
+- It does not choose which hypothesis is correct. A human decides what to
+  apply.
+
+### funnel-researcher
+
+`funnel-researcher` diagnoses developer dropoff at a funnel step. Given the
+funnel definition, the per-step dropoff data, and the product's artifacts, it
+produces a markdown report of 2–3 structurally distinct hypotheses about why
+developers stall at the target step. Each hypothesis is assigned to one layer
+(Funnel definition, API/SDK surface, Docs/Context, Workflow/Sequence),
+grounded in both a specific dropoff signal and a `file:line` citation into the
+product surface, and ships an applyable structured edit. The diagnostic logic
+lives in the CLI; you invoke the CLI through your shell and relay what it
+produced.
+
+#### When to invoke
+
+Invoke when the user has a developer-API onboarding funnel (defined as YAML),
+dropoff data per step, and a directory of product artifacts (docs, SDK source,
+error catalog), and wants to know why developers fall off at a target step.
+The user typically says something like *"developers are dropping off at the
+first-API-call step of the activation funnel — figure out why."* This is the
+trigger: a defined funnel, measured dropoff at a specific step, and a product
+surface to ground the explanation in.
+
+Do not invoke without measured dropoff data, without a funnel definition, or
+for a generic "improve onboarding" request with no specific stalling step.
+
+#### Prerequisites
+
+- The `funnel-researcher` CLI on PATH. Install from a clone of
+  <https://github.com/ivaylogb/funnel-researcher>:
+  ```bash
+  pip install -e .
+  export ANTHROPIC_API_KEY=sk-ant-...
+  ```
+- `ANTHROPIC_API_KEY` set — `diagnose` spends model tokens.
+
+#### Inputs
+
+| Input | Flag | Required | Notes |
+|---|---|---|---|
+| Funnel definition | `--funnel` | yes | YAML defining the funnel steps. |
+| Dropoff data | `--dropoff` | yes | JSON with per-step dropoff numbers. |
+| Product artifact directory | `--product` | yes | Docs, SDK source, error catalog. |
+| Output path | `--output-file` | yes | Where to write the report (markdown). |
+| Extra artifact file | `--extra-file` | no | Repeatable; pulls in a file outside the product dir. |
+| Model | `--model` | no | Claude model override. |
+| Max tokens | `--max-tokens` | no | Output token cap. |
+
+#### Outputs
+
+A markdown hypotheses report written to `--output-file`. `--output-file` is
+required by the CLI; use `./funnel-hypotheses.md` as the default name. After
+it completes, read that file back and present each hypothesis with its layer,
+the dropoff signal it explains, its `file:line` citation, and the proposed
+edit.
+
+#### Invocation
+
+Run the installed CLI directly through your shell:
+
+```bash
+funnel-researcher diagnose \
+    --funnel ./funnel.yaml \
+    --dropoff ./dropoff_data.json \
+    --product ./product_artifacts \
+    --output-file ./funnel-hypotheses.md
+```
+
+Then read `./funnel-hypotheses.md` and present each hypothesis with its layer,
+the dropoff signal it explains, its `file:line` citation, and the proposed
+edit.
+
+#### What this tool does not do
+
+- It does not apply edits or run `iterate`. Those are separate CLI
+  subcommands; do not invoke them as part of diagnosis.
+- It does not invent hypotheses itself — relay what the CLI produced.
+- It does not decide which hypothesis is correct. A human picks what to apply.
+
+### integration-watcher
+
+`integration-watcher` finds patterns across a cohort's integration traces.
+Given the trace stream, the cohort definition (including the watch question),
+and the product's artifacts, it produces a markdown findings report of 2–3
+structurally distinct findings about how that cohort's integrations get stuck.
+Each finding is assigned to one layer (Trace definition, API/SDK surface,
+Docs/Context, Integration sequence), grounded in both trace evidence
+(`developer_id` + call sequence) and product evidence (`file:line`), and ships
+an applyable structured edit. The analysis logic lives in the CLI; you invoke
+the CLI through your shell and relay what it produced.
+
+#### When to invoke
+
+Invoke when the user has API call traces (JSONL), a cohort definition (YAML)
+with a watch question, and a directory of product artifacts (docs, SDK source,
+error catalog), and wants the patterns in how that cohort's integrations get
+stuck. The user typically says something like *"the traces from our beta
+cohort are in `traces.jsonl` — tell me why so many integrations stall after
+the first call."* This is the trigger: a trace cohort, a watch question, and a
+product surface to ground the patterns in.
+
+Do not invoke without a trace stream, without a cohort definition, or as a
+substitute for analytics, telemetry, or session replay — this surfaces
+structural patterns and traces them to product artifacts, not usage metrics.
+
+#### Prerequisites
+
+- The `integration-watcher` CLI on PATH. Install from a clone of
+  <https://github.com/ivaylogb/integration-watcher>:
+  ```bash
+  pip install -e .
+  export ANTHROPIC_API_KEY=sk-ant-...
+  ```
+- `ANTHROPIC_API_KEY` set — `watch` spends model tokens.
+
+#### Inputs
+
+| Input | Flag | Required | Notes |
+|---|---|---|---|
+| Trace stream | `--traces` | yes | JSONL of API-call traces across the cohort. |
+| Cohort definition | `--cohort` | yes | YAML; includes the watch question. |
+| Product artifact directory | `--product` | yes | Docs, SDK source, error catalog. |
+| Output path | `--output-file` | yes | Where to write the report (markdown). |
+| Extra artifact file | `--extra-file` | no | Repeatable; pulls in a file outside the product dir. |
+| Model | `--model` | no | Claude model override. |
+| Max tokens | `--max-tokens` | no | Output token cap. |
+
+#### Outputs
+
+A markdown findings report written to `--output-file`. `--output-file` is
+required by the CLI; use `./integration-findings.md` as the default name.
+After it completes, read that file back and present each finding with its
+layer, the trace evidence (`developer_id` + call sequence), the `file:line`
+citation, and the proposed edit.
+
+#### Invocation
+
+Run the installed CLI directly through your shell:
+
+```bash
+integration-watcher watch \
+    --traces ./traces.jsonl \
+    --cohort ./cohort.yaml \
+    --product ./product_artifacts \
+    --output-file ./integration-findings.md
+```
+
+Then read `./integration-findings.md` and present each finding with its layer,
+the trace evidence (`developer_id` + call sequence), the `file:line`
+citation, and the proposed edit.
+
+#### What this tool does not do
+
+- It does not apply edits or run `iterate`. Those are separate CLI
+  subcommands; do not invoke them as part of analysis.
+- It does not find patterns itself — relay what the CLI produced.
+- It is not analytics, telemetry, or session replay. It surfaces structural
+  patterns and traces them to product artifacts.
+
+### pluma-cross
+
+`pluma cross` reports where two or more diagnostic tools independently
+converge on the same defect. Given the raw inputs for two or more sister tools
+— all pointing at the same `--product` — it runs each applicable tool through
+its input-hash cache, normalizes every report into a unified Finding shape,
+and emits one report: a correlation matrix (tool × layer), the findings that
+show up in **more than one** tool (mechanical match on overlapping
+`file:line`, or categorical match on shared layer + product file), then the
+findings unique to each tool. The cross-match logic lives in the CLI; you
+invoke the CLI through your shell and relay what it produced.
+
+`pluma cross` takes raw tool inputs and re-runs the tools; it does not consume
+pre-generated finding markdown. The cache is what makes re-runs cheap: if a
+tool was already run with the exact same inputs, that tool's run is a cache
+hit and spends no model tokens — only the tools whose inputs were not
+previously cached spend.
+
+#### When to invoke
+
+Invoke when the user wants to run two or more diagnostic tools against the
+same product surface and find where they independently agree. The user
+typically says something like *"I have funnel/dropoff data and a trace cohort
+for the same API — run both diagnostics and show me where they agree."* If the
+individual tools were already run with identical inputs, `pluma cross` hits
+the cache and only runs the cross-match step at near-zero cost.
+
+Do not invoke with inputs for only one tool, or with tools pointed at
+different product surfaces — convergence is only meaningful across tools
+diagnosing the same `--product`.
+
+#### Prerequisites
+
+- The `pluma` CLI on PATH, plus the sister tools it routes to
+  (agent-researcher, funnel-researcher, integration-watcher). Install from a
+  clone of <https://github.com/ivaylogb/pluma> (and the tool repos it
+  orchestrates):
+  ```bash
+  pip install -e .
+  export ANTHROPIC_API_KEY=sk-ant-...
+  ```
+- `ANTHROPIC_API_KEY` set — any tool that is **not** a cache hit spends model
+  tokens.
+
+#### Inputs
+
+`--product` and `--output-file` are required. Provide the input flags for **at
+least two** tools, all describing the same product:
+
+| Tool | Flags (both required for that tool) |
+|---|---|
+| funnel-researcher | `--funnel` + `--dropoff` |
+| integration-watcher | `--traces` + `--cohort` |
+| agent-researcher | `--eval-result` + `--target-agent` |
+
+Optional passthrough: `--model`, `--max-tokens`, `--extra-file` (repeatable),
+`--no-cache`, `--force`. Do not invoke unless at least two complete tool input
+sets are present.
+
+#### Outputs
+
+A markdown cross-tool report written to `--output-file`. `--output-file` is
+required by the CLI; use `./pluma-cross.md` as the default name. After it
+completes, read that file back and surface the correlation matrix and the
+cross-tool findings.
+
+#### Invocation
+
+Run the installed CLI directly through your shell:
+
+```bash
+pluma cross \
+    --product ./product_artifacts \
+    --funnel ./funnel.yaml \
+    --dropoff ./dropoff_data.json \
+    --traces ./traces.jsonl \
+    --cohort ./cohort.yaml \
+    --output-file ./pluma-cross.md
+```
+
+If `funnel-researcher` and `integration-watcher` were already run on these
+exact inputs, this run is mostly cache hits — the convergence report comes
+back at near-zero cost. Pass `--force` to re-run anyway, or `--no-cache` to
+bypass the cache entirely. Then read `./pluma-cross.md` and present the
+correlation matrix, the cross-tool findings, and each tool's unique findings.
+
+#### What this tool does not do
+
+- It does not consume pre-generated finding files. `pluma cross` takes raw
+  inputs and runs the tools (cache-backed).
+- It does not run `apply` / `iterate`. Those are separate `pluma`
+  subcommands.
+- It does not correlate findings itself — the CLI does the matching.
+- It does not decide which converged finding to act on. A human decides.
