@@ -1,3 +1,20 @@
+# NOTE: This file diverges from the upstream bundle at
+# _bundle_day1/otel_to_traces.py.
+#
+# Divergence: accept string-encoded numeric values from
+# proto3-strict OTLP exports. The bundle version requires
+# isinstance(x, (int, float)) for status codes and timestamps,
+# which silently zeros out values from exporters emitting
+# spec-compliant proto3-JSON (where int64 is encoded as a
+# string). This file accepts both numeric and string-numeric
+# shapes.
+#
+# If re-syncing from the bundle, preserve this divergence or
+# patch the bundle upstream. The committed tests
+# (test_otlp_proto3_strict_string_status_recognized in
+# tests/test_otel_converter.py) will fail if the divergence is
+# reverted without a matching bundle update.
+
 """OpenTelemetry spans → integration-watcher trace JSONL.
 
 The de-facto standard for distributed tracing in 2026 is OpenTelemetry.
@@ -159,6 +176,30 @@ def _latency_ms_from_otlp(start: Any, end: Any) -> int:
         return max(0, (int(end) - int(start)) // 1_000_000)
     except (TypeError, ValueError):
         return 0
+
+
+def _status_to_int(status: Any) -> int:
+    """HTTP status as int, accepting numeric and string-numeric values.
+
+    OTLP/JSON exporters disagree on int64 encoding: many emit a JSON
+    number, but spec-compliant proto3-JSON encodes int64 (including a
+    status code carried as ``intValue``) as a *string*. The bundle
+    version only accepted the numeric shape and silently zeroed
+    string-encoded statuses. This is purely additive: every value the
+    bundle already accepted maps identically (``int``/``float`` ->
+    ``int(status)``; non-numeric -> 0); a string that parses as an int
+    is now also accepted. ``_nanos_to_iso`` / ``_latency_ms_from_otlp``
+    already coerce string nanos via ``int()``, so timestamps and
+    latency needed no change — status was the only hard isinstance gate.
+    """
+    if isinstance(status, (int, float)):
+        return int(status)
+    if isinstance(status, str):
+        try:
+            return int(status)
+        except ValueError:
+            return 0
+    return 0
 
 
 def _compact_request_summary(attrs: dict[str, Any]) -> str:
@@ -325,7 +366,7 @@ def _span_to_record(
         developer_id=str(dev_id) if dev_id is not None else "",
         endpoint=endpoint,
         request_summary=_compact_request_summary(attrs),
-        response_status=int(status) if isinstance(status, (int, float)) else 0,
+        response_status=_status_to_int(status),
         error_code=str(error_code) if error_code else None,
         latency_ms=latency_ms,
     )

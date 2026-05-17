@@ -2782,6 +2782,325 @@
               "status": {
                 "code": 0
               }
+            },
+            {
+              "traceId": "c9d768b466b4e7877f5f4f09cba0730f",
+              "spanId": "196deb235a5708a0",
+              "name": "integration.session dev_kilo",
+              "kind": 1,
+              "startTimeUnixNano": "1778835766932000000",
+              "endTimeUnixNano": "1778835768932000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_kilo"
+                  }
+                },
+                {
+                  "key": "session.kind",
+                  "value": {
+                    "stringValue": "developer-integration"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "c9d768b466b4e7877f5f4f09cba0730f",
+              "spanId": "da639262c73d2403",
+              "parentSpanId": "196deb235a5708a0",
+              "name": "SELECT api_key",
+              "kind": 3,
+              "startTimeUnixNano": "1778835766933000000",
+              "endTimeUnixNano": "1778835766936000000",
+              "attributes": [
+                {
+                  "key": "db.system",
+                  "value": {
+                    "stringValue": "postgresql"
+                  }
+                },
+                {
+                  "key": "db.statement",
+                  "value": {
+                    "stringValue": "SELECT id FROM api_key WHERE token=$1"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "c9d768b466b4e7877f5f4f09cba0730f",
+              "spanId": "93017cf79099e83b",
+              "parentSpanId": "196deb235a5708a0",
+              "name": "POST /v1/auth/token",
+              "kind": 3,
+              "startTimeUnixNano": "1778835766932000000",
+              "endTimeUnixNano": "1778835767107000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_kilo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "POST"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/auth/token"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                },
+                {
+                  "key": "http.request.header.content-type",
+                  "value": {
+                    "stringValue": "application/json"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "c9d768b466b4e7877f5f4f09cba0730f",
+              "spanId": "2fe20a54845ed378",
+              "parentSpanId": "196deb235a5708a0",
+              "name": "GET /v1/projects",
+              "kind": 3,
+              "startTimeUnixNano": "1778835770107000000",
+              "endTimeUnixNano": "1778835770199000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_kilo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
+            },
+            {
+              "traceId": "c9d768b466b4e7877f5f4f09cba0730f",
+              "spanId": "51caddf54777e0d1",
+              "parentSpanId": "196deb235a5708a0",
+              "name": "GET /v1/projects/proj_kilo/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835773199000000",
+              "endTimeUnixNano": "1778835774079000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_kilo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_kilo/items"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_kilo/items"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_kilo/items"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "503"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "503"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "c9d768b466b4e7877f5f4f09cba0730f",
+              "spanId": "7ab35540a878b051",
+              "parentSpanId": "196deb235a5708a0",
+              "name": "GET /v1/projects/proj_kilo/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835777079000000",
+              "endTimeUnixNano": "1778835777989000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_kilo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_kilo/items"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_kilo/items"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_kilo/items"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "503"
+                  }
+                },
+                {
+                  "key": "error.type",
+                  "value": {
+                    "stringValue": "503"
+                  }
+                }
+              ],
+              "status": {
+                "code": 2
+              }
+            },
+            {
+              "traceId": "c9d768b466b4e7877f5f4f09cba0730f",
+              "spanId": "c5724150bc8876f3",
+              "parentSpanId": "196deb235a5708a0",
+              "name": "GET /v1/projects/proj_kilo/items",
+              "kind": 3,
+              "startTimeUnixNano": "1778835780989000000",
+              "endTimeUnixNano": "1778835781129000000",
+              "attributes": [
+                {
+                  "key": "enduser.id",
+                  "value": {
+                    "stringValue": "dev_kilo"
+                  }
+                },
+                {
+                  "key": "http.request.method",
+                  "value": {
+                    "stringValue": "GET"
+                  }
+                },
+                {
+                  "key": "url.path",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_kilo/items"
+                  }
+                },
+                {
+                  "key": "url.full",
+                  "value": {
+                    "stringValue": "https://api.acme-dev.example.com/v1/projects/proj_kilo/items"
+                  }
+                },
+                {
+                  "key": "http.route",
+                  "value": {
+                    "stringValue": "/v1/projects/proj_kilo/items"
+                  }
+                },
+                {
+                  "key": "http.response.status_code",
+                  "value": {
+                    "intValue": "200"
+                  }
+                }
+              ],
+              "status": {
+                "code": 0
+              }
             }
           ]
         }
