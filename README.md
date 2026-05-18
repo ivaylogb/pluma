@@ -90,6 +90,17 @@ Connect Pluma to existing analytics platforms and data sources.
 
 - **[GitHub Action template](templates/github-action/)** — drop-in workflow for running Pluma diagnosis on PRs or via webhook. Triggers on Braintrust experiment completion (`repository_dispatch`), manual `workflow_dispatch`, or `workflow_call` from a CI job; posts findings to the PR as a comment or opens an issue. Ships untested against real CI infrastructure — smoke test on a sandbox repo before relying on it.
 
+
+## OpenAPI spec, SDK, and API docs
+
+Pluma's HTTP API surface is defined by an OpenAPI 3.1.0 spec (canonical source: `src/pluma/api/openapi.yaml`). Stainless generates the Python SDK and API reference docs from that spec.
+
+- **Python SDK** — [`stainless-sdks/pluma-python`](https://github.com/stainless-sdks/pluma-python). Install: `pip install git+ssh://git@github.com/stainless-sdks/pluma-python.git`
+- **API reference docs** — [pluma.stldocs.app](https://pluma.stldocs.app)
+- **FastAPI server** — `src/pluma/api/` (multi-tool dispatcher: routes Braintrust/LangSmith sources to agent-researcher and PostHog sources to integration-watcher)
+
+This repo is the canonical implementation: CLI orchestrator, integrations, FastAPI server, and the spec the SDKs derive from.
+
 ## Install
 
 ```bash
