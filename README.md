@@ -120,20 +120,35 @@ pip install -e ".[api]"      # FastAPI + uvicorn + pydantic
 
 The server binds **loopback only** (`127.0.0.1:8000`) — that loopback
 boundary is the real security control; the `X-Pluma-Key` check exists for
-spec compliance and non-loopback deployments.
+spec compliance and non-loopback deployments. The bind is loopback
+**inside the process**, by design (it is never `0.0.0.0`), which has a
+direct consequence for Docker (below).
 
-Docker (the default deployment):
+**Native (recommended for local dev, and the only supported path on
+macOS/Windows):**
+
+```bash
+pip install -e ".[api]"
+python -m pluma.api          # or the `pluma-api` console script
+```
+
+**Docker.** Because the server listens on the *container's* loopback,
+`docker run -p 127.0.0.1:8000:8000 pluma-api` does **not** work — Docker
+publishes to the container's bridge interface, not its loopback, so the
+published port is refused. The bind is intentionally loopback (the
+security model); the fix is how you run the container, not the bind:
 
 ```bash
 docker build -f Dockerfile.api -t pluma-api .
-docker run -p 127.0.0.1:8000:8000 pluma-api
+
+# Linux: share the host network namespace, so the container's loopback
+# IS the host's loopback — the loopback security boundary is preserved.
+docker run --network host pluma-api
 ```
 
-Or directly:
-
-```bash
-python -m pluma.api          # or the `pluma-api` console script
-```
+On macOS/Windows, Docker Desktop runs containers inside a VM, so
+`--network host` does not give you host loopback either; use the native
+path above for development on those platforms.
 
 **The API key is generated at startup and printed once to stderr** (with
 Docker, read it from `docker logs <container>`). It is persisted to

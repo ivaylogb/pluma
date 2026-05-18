@@ -1,14 +1,28 @@
 # Pluma HTTP API — multi-stage build.
 #
-# The server binds 127.0.0.1:8000 (loopback only): the default deployment
-# treats loopback as the security boundary. Run with an explicit loopback
-# publish so Docker doesn't widen it:
+# The server binds 127.0.0.1:8000 INSIDE the container (loopback only).
+# This is intentional: loopback is the security model's real boundary
+# (see auth.py). It is NOT changed to 0.0.0.0.
 #
-#     docker build -f Dockerfile.api -t pluma-api .
-#     docker run -p 127.0.0.1:8000:8000 pluma-api
+# Consequence: `docker run -p 127.0.0.1:8000:8000 pluma-api` does NOT
+# work. Docker's port publishing forwards to the container's bridge
+# interface, but the server only listens on the container's loopback,
+# so the published port gets connection-refused.
+#
+# Correct ways to run it:
+#
+#   Linux  — share the host network namespace so container loopback IS
+#            host loopback (preserves the loopback security boundary):
+#              docker build -f Dockerfile.api -t pluma-api .
+#              docker run --network host pluma-api
+#
+#   macOS / Windows — Docker Desktop runs containers inside a VM, so
+#            container loopback is not the host's; native is the
+#            recommended dev path:
+#              pip install -e ".[api]" && python -m pluma.api
 #
 # The API key is generated at startup and printed once to the container's
-# stderr; read it from `docker logs`.
+# stderr; read it from `docker logs <container>`.
 
 # ---- builder ----------------------------------------------------------
 FROM python:3.11-slim AS builder

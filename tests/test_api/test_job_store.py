@@ -94,6 +94,28 @@ def test_terminal_states_are_sticky():
     assert store.get(job.job_id).status is JobStatus.cancelled
 
 
+def test_update_status_does_not_clobber_cancelled_job():
+    """Regression for bug W1.
+
+    Simulates the worker race: a DELETE (cancel) lands between the
+    worker's pending→running check and its update_status(running) call.
+    update_status must be a no-op on a terminal job — the cancellation
+    must survive and terminated_at must be preserved (not left non-null
+    against a 'running' status).
+    """
+    store = JobStore()
+    job = store.create(_req())
+    cancelled = store.cancel(job.job_id)
+    assert cancelled.status is JobStatus.cancelled
+    terminated_at = cancelled.terminated_at
+    assert terminated_at is not None
+
+    after = store.update_status(job.job_id, JobStatus.running)
+    assert after.status is JobStatus.cancelled  # not resurrected
+    assert after.terminated_at == terminated_at  # preserved, not stale
+    assert store.get(job.job_id).status is JobStatus.cancelled
+
+
 def test_cancel_unknown_returns_none_and_is_idempotent():
     store = JobStore()
     assert store.cancel("job_000000000000000000000000") is None

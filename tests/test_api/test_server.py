@@ -11,6 +11,7 @@ import re
 import threading
 import time
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 
@@ -113,6 +114,33 @@ def test_wrong_key_is_401(client):
     )
     assert r.status_code == 401
     assert r.json()["code"] == "unauthorized"
+
+
+def test_non_ascii_api_key_is_401_not_500(client):
+    """Regression for bug A1.
+
+    The original suite missed this: httpx auto-encodes str header values
+    as ASCII, so a plain ``headers={"X-Pluma-Key": "\\xa7"}`` never even
+    leaves the client. A real client (e.g. ``curl -H $'X-Pluma-Key:
+    \\xa7'``) sends the raw byte; Starlette latin-1-decodes it into a
+    non-ASCII ``str``, and ``secrets.compare_digest`` on a non-ASCII
+    ``str`` raises ``TypeError`` — which, pre-fix, escaped ``verify_api_key``
+    as a 500 instead of a clean 401. We send the raw header bytes here so
+    the server sees exactly what a hostile client would, and assert the
+    spec-correct 401 ``unauthorized``.
+    """
+    req = client.build_request(
+        "POST",
+        "/v1/jobs",
+        json={"sources": [{"type": "braintrust", "experiment_id": "e"}]},
+    )
+    raw = [(k, v) for k, v in req.headers.raw if k.lower() != b"x-pluma-key"]
+    raw.append((b"x-pluma-key", b"\xa7not-the-key"))  # 0xA7 → non-ASCII
+    req.headers = httpx.Headers(raw)
+    r = client.send(req)
+    assert r.status_code == 401
+    assert r.json()["code"] == "unauthorized"
+    assert REQ_RE.match(r.headers["X-Request-Id"])
 
 
 def test_valid_key_creates_job(client):

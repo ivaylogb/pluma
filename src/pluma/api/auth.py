@@ -136,7 +136,14 @@ async def verify_api_key(
     absent or does not match the loaded key.
     """
     expected = get_api_key()
+    # Compare as bytes, not str: secrets.compare_digest raises TypeError on
+    # a str containing non-ASCII characters, and Starlette latin-1-decodes
+    # raw header bytes, so a client sending a non-ASCII byte in X-Pluma-Key
+    # would otherwise escape as a 500 instead of a clean 401. UTF-8 encodes
+    # every latin-1 code point, so "ignore" never drops bytes here (no
+    # truncation/collision risk); it is purely defensive.
     if x_pluma_key is None or not secrets.compare_digest(
-        x_pluma_key, expected
+        x_pluma_key.encode("utf-8", "ignore"),
+        expected.encode("utf-8"),
     ):
         raise AuthError("Missing or invalid X-Pluma-Key header")

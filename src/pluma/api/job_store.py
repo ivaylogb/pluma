@@ -162,8 +162,21 @@ class JobStore:
     def update_status(
         self, job_id: str, status: JobStatus
     ) -> Optional[Job]:
-        """Set status only (e.g. ``pending`` → ``running``)."""
+        """Set status only (e.g. ``pending`` → ``running``).
+
+        No-op if the job is already terminal. Without this guard a
+        ``DELETE`` that lands in the worker's pending→running window
+        would be clobbered (cancelled job resurrected to ``running``
+        with a stale ``terminated_at``). Matches the sticky-terminal
+        invariant enforced by :meth:`mark_terminated`, :meth:`set_error`,
+        and :meth:`cancel`.
+        """
         with self._lock:
+            rec = self._jobs.get(job_id)
+            if rec is None:
+                return None
+            if rec.job.status.is_terminal:
+                return rec.job
             return self._replace(job_id, status=status)
 
     def set_findings(
