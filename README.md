@@ -91,30 +91,36 @@ Connect Pluma to existing analytics platforms and data sources.
 - **[GitHub Action template](templates/github-action/)** — drop-in workflow for running Pluma diagnosis on PRs or via webhook. Triggers on Braintrust experiment completion (`repository_dispatch`), manual `workflow_dispatch`, or `workflow_call` from a CI job; posts findings to the PR as a comment or opens an issue. Ships untested against real CI infrastructure — smoke test on a sandbox repo before relying on it.
 
 
-## OpenAPI spec, SDK, and API docs
+## SDKs, MCP server, and API docs
 
-Pluma's HTTP API surface is defined by an OpenAPI 3.1.0 spec (canonical source: `src/pluma/api/openapi.yaml`). Stainless generates the Python SDK and API reference docs from that spec.
-
-- **Python SDK** — [`stainless-sdks/pluma-python`](https://github.com/stainless-sdks/pluma-python). Install: `pip install git+ssh://git@github.com/stainless-sdks/pluma-python.git`
-- **API reference docs** — [pluma.stldocs.app](https://pluma.stldocs.app)
-- **FastAPI server** — `src/pluma/api/` (multi-tool dispatcher: routes Braintrust/LangSmith sources to agent-researcher and PostHog sources to integration-watcher)
-
-This repo is the canonical implementation: CLI orchestrator, integrations, FastAPI server, and the spec the SDKs derive from.
-
-The server in `src/pluma/api/` implements a single `Job` resource
-(`POST /v1/jobs`, `GET /v1/jobs/{id}`, `DELETE /v1/jobs/{id}`,
-`GET /v1/jobs/{id}/findings`) plus an unauthenticated `GET /v1/healthz`.
-v0.1 populates the `FailingEvalContainer` honestly: `category` is always
+Pluma's HTTP API is defined by a single OpenAPI 3.1.0 spec — the canonical
+source of truth at [`src/pluma/api/openapi.yaml`](src/pluma/api/openapi.yaml).
+This repo is the canonical implementation: the CLI orchestrator, the
+integrations, and the FastAPI server in `src/pluma/api/` (a single `Job`
+resource — `POST /v1/jobs`, `GET /v1/jobs/{id}`, `DELETE /v1/jobs/{id}`,
+`GET /v1/jobs/{id}/findings`, plus unauthenticated `GET /v1/healthz`;
+install it with `pip install -e ".[api]"`). v0.1 populates the
+`FailingEvalContainer` honestly: `category` is always
 `measurement_instrument`, `applyable` is always `false`, and `edit` is
-always `null`; PostHog support is v0.2, so a PostHog source fails the job
-with a structured `not_implemented` (surfaced as HTTP 501). See the
-"API v0.1 capability vs schema" table in the spec's `info.description`.
+always `null`; a PostHog source fails the job with a structured
+`not_implemented` (HTTP 501). See the "API v0.1 capability vs schema"
+table in the spec's `info.description`.
 
-Install the optional API extra:
+Stainless regenerates a family of artifacts from that spec:
 
-```bash
-pip install -e ".[api]"      # FastAPI + uvicorn + pydantic
-```
+- **OpenAPI spec** — [`src/pluma/api/openapi.yaml`](src/pluma/api/openapi.yaml). The canonical source of truth; everything below is generated from it.
+- **Python SDK** — [`stainless-sdks/pluma-python`](https://github.com/stainless-sdks/pluma-python) (generated, staging).
+- **TypeScript SDK** — [`stainless-sdks/pluma-typescript`](https://github.com/stainless-sdks/pluma-typescript) (generated, staging).
+- **Go SDK** — [`stainless-sdks/pluma-go`](https://github.com/stainless-sdks/pluma-go) (generated, staging).
+- **MCP server** — [`stainless-sdks/pluma-typescript/packages/mcp-server`](https://github.com/stainless-sdks/pluma-typescript/tree/main/packages/mcp-server). A Stainless-generated TypeScript package using the **Code Mode** architecture: two tools — `execute` and `search_docs` — where the agent writes code against the SDK instead of calling one tool per endpoint. Runs in local or hosted execution modes.
+- **API documentation site** — [pluma.stldocs.app](https://pluma.stldocs.app).
+
+All five generated artifacts — the three SDKs, the MCP server, and the
+docs site — derive from that one OpenAPI spec. The spec is the source of
+truth; the artifacts are regenerated from it, never hand-edited. The SDKs
+and MCP server are **generated and staging-only**: they live under
+`stainless-sdks/*` and are not published to PyPI, npm, or any other
+package registry.
 
 ### Running the server
 
@@ -212,7 +218,7 @@ Add `--no-cache` to force a live run, `--force` to re-run despite a cache hit.
 python -m pytest
 ```
 
-114 tests, no API calls — every sister-tool entrypoint is monkey-patched, so the suite runs in <1s and costs nothing. Coverage: runners (each tool, incl. upstream `anthropic.APIError` handling), the input-hash cache (hit/miss/force/invalidation), the normalizer (per-tool parsing, trailing-section boundaries, citation extraction), the router (explicit/inferred/ambiguous/origin-tag), cross-tool match detection (mechanical/categorical/unique/correlation), and the CLI surface for every subcommand.
+210 tests, no API calls — every sister-tool entrypoint is monkey-patched, so the suite runs in <1s and costs nothing. Coverage: runners (each tool, incl. upstream `anthropic.APIError` handling), the input-hash cache (hit/miss/force/invalidation), the normalizer (per-tool parsing, trailing-section boundaries, citation extraction), the router (explicit/inferred/ambiguous/origin-tag), cross-tool match detection (mechanical/categorical/unique/correlation), and the CLI surface for every subcommand.
 
 ## License
 
