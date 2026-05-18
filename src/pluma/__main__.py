@@ -44,6 +44,16 @@ from .integrations.braintrust.experiment_to_failing_evals import (
     DEFAULT_MAX_SPANS,
     ScoreBand,
 )
+from .integrations.langsmith.langsmith_client import (
+    DEFAULT_BASE_URL as LANGSMITH_DEFAULT_BASE_URL,
+    LangSmithAPIError,
+    fetch_runs_as_failing_evals,
+)
+from .integrations.langsmith.runs_to_failing_evals import (
+    DEFAULT_MAX_TOTAL_NODES as LANGSMITH_DEFAULT_MAX_TOTAL_NODES,
+    DEFAULT_MAX_TREE_DEPTH as LANGSMITH_DEFAULT_MAX_TREE_DEPTH,
+    DEFAULT_THRESHOLD as LANGSMITH_DEFAULT_THRESHOLD,
+)
 
 # Sister-tool dispatch table for `apply` / `iterate`.
 _APPLY_RUNNERS = {
@@ -108,11 +118,13 @@ def _build_parser() -> argparse.ArgumentParser:
 
     # diagnose-agent
     p = subs.add_parser("diagnose-agent", help="agent-researcher diagnose")
-    # --eval-result becomes one of several sources (the other being a live
-    # Braintrust experiment), so argparse no longer hard-requires it; the
-    # handler validates that exactly one source is present.
+    # --eval-result becomes one of several sources (the others being a
+    # live Braintrust experiment or live LangSmith runs), so argparse no
+    # longer hard-requires it; the handler validates that exactly one
+    # source is present.
     _add_agent_diagnose_flags(p, eval_result_required=False)
     _add_braintrust_source_flags(p)
+    _add_langsmith_source_flags(p)
 
     # watch
     p = subs.add_parser("watch", help="integration-watcher watch")
@@ -283,6 +295,99 @@ def _add_braintrust_source_flags(p: argparse.ArgumentParser) -> None:
     )
 
 
+def _add_langsmith_source_flags(p: argparse.ArgumentParser) -> None:
+    """Live-LangSmith source for diagnose-agent.
+
+    Two workflows, mutually exclusive with each other, with
+    --eval-result, and with the --braintrust-* flags. Workflow A
+    (--langsmith-experiment-id) reads dataset reference outputs;
+    workflow B (--langsmith-project [--filter]) walks production
+    traces. Unlike Braintrust, agent_revision is never auto-resolved —
+    --agent-revision is the only way to set it (LangSmith has no
+    git-SHA convention).
+    """
+    g = p.add_argument_group(
+        "langsmith source (alternative to --eval-result / --braintrust-*)"
+    )
+    g.add_argument(
+        "--langsmith-experiment-id",
+        type=str,
+        default=None,
+        help="Workflow A: diagnose this LangSmith Dataset-Experiment "
+        "(tracing session) id, pulled live via the API.",
+    )
+    g.add_argument(
+        "--langsmith-project",
+        type=str,
+        default=None,
+        help="Workflow B: diagnose root runs in this LangSmith project "
+        "(production traces).",
+    )
+    g.add_argument(
+        "--filter",
+        type=str,
+        default=None,
+        help="Workflow B only: a LangSmith filter-DSL expression passed "
+        "through verbatim.",
+    )
+    g.add_argument(
+        "--primary-feedback-key",
+        type=str,
+        default=None,
+        help="Feedback key that decides pass/fail. If omitted, a run "
+        "fails when any feedback key scores below --threshold.",
+    )
+    g.add_argument(
+        "--threshold",
+        type=float,
+        default=LANGSMITH_DEFAULT_THRESHOLD,
+        help=f"Minimum passing score for LangSmith feedback (default: "
+        f"{LANGSMITH_DEFAULT_THRESHOLD}).",
+    )
+    g.add_argument(
+        "--reference-feedback-key",
+        type=str,
+        default=None,
+        help="Workflow B only: feedback key whose value is the "
+        "reference output (populates `expected` absent a dataset "
+        "Example).",
+    )
+    g.add_argument(
+        "--agent-revision",
+        type=str,
+        default=None,
+        help="Git SHA (or similar) for the agent source. LangSmith has "
+        "no SHA convention — never auto-resolved.",
+    )
+    g.add_argument(
+        "--max-tree-depth",
+        type=int,
+        default=LANGSMITH_DEFAULT_MAX_TREE_DEPTH,
+        help=f"Run-tree BFS depth bound, root = 0 (default: "
+        f"{LANGSMITH_DEFAULT_MAX_TREE_DEPTH}).",
+    )
+    g.add_argument(
+        "--max-total-nodes",
+        type=int,
+        default=LANGSMITH_DEFAULT_MAX_TOTAL_NODES,
+        help=f"Global span-node cap per run (default: "
+        f"{LANGSMITH_DEFAULT_MAX_TOTAL_NODES}).",
+    )
+    g.add_argument(
+        "--langsmith-api-key",
+        type=str,
+        default=None,
+        help="LangSmith API key. Falls back to LANGSMITH_API_KEY.",
+    )
+    g.add_argument(
+        "--langsmith-base-url",
+        type=str,
+        default=LANGSMITH_DEFAULT_BASE_URL,
+        help=f"LangSmith API base URL (default: "
+        f"{LANGSMITH_DEFAULT_BASE_URL}).",
+    )
+
+
 def _add_watch_flags(p: argparse.ArgumentParser) -> None:
     p.add_argument("--traces", type=Path, required=True)
     p.add_argument("--cohort", type=Path, required=True)
@@ -341,21 +446,26 @@ def _run_explicit(args: argparse.Namespace, sub: str) -> int:
         bt_exp = getattr(args, "braintrust_experiment_id", None)
         bt_proj = getattr(args, "braintrust_project", None)
         bt_latest = getattr(args, "latest", False)
+        ls_exp = getattr(args, "langsmith_experiment_id", None)
+        ls_proj = getattr(args, "langsmith_project", None)
         eval_result = getattr(args, "eval_result", None)
-        live = bool(bt_exp or bt_proj)
 
         err = _validate_agent_source(
             eval_result=eval_result,
             bt_exp=bt_exp,
             bt_proj=bt_proj,
             bt_latest=bt_latest,
+            ls_exp=ls_exp,
+            ls_proj=ls_proj,
         )
         if err is not None:
             print(err, file=sys.stderr)
             return 2
 
-        if live:
+        if bt_exp or bt_proj:
             return _run_agent_diagnose_live(args)
+        if ls_exp or ls_proj:
+            return _run_agent_diagnose_live_langsmith(args)
 
         return _wrap_cache(
             tool="agent-researcher",
@@ -408,19 +518,37 @@ def _validate_agent_source(
     bt_exp: Optional[str],
     bt_proj: Optional[str],
     bt_latest: bool,
+    ls_exp: Optional[str] = None,
+    ls_proj: Optional[str] = None,
 ) -> Optional[str]:
     """Enforce the diagnose-agent source rules. Returns an error string to
     print (caller exits 2) or None when the flags are coherent.
 
-    Order matters: the most specific conflict wins, so a stray --latest or
-    a project without --latest gets a precise message instead of the
+    Three source families — file (--eval-result), Braintrust
+    (--braintrust-*), LangSmith (--langsmith-*) — exactly one. Order
+    matters: the most specific conflict wins, so a stray --latest or a
+    project without --latest gets a precise message instead of the
     generic "no source" one.
     """
-    if (bt_exp or bt_proj) and eval_result is not None:
+    bt_any = bool(bt_exp or bt_proj)
+    ls_any = bool(ls_exp or ls_proj)
+
+    if bt_any and eval_result is not None:
         return (
             "diagnose-agent: --eval-result and the --braintrust-* flags are "
             "mutually exclusive — pass a file source or a Braintrust source, "
             "not both."
+        )
+    if ls_any and eval_result is not None:
+        return (
+            "diagnose-agent: --eval-result and the --langsmith-* flags are "
+            "mutually exclusive — pass a file source or a LangSmith source, "
+            "not both."
+        )
+    if bt_any and ls_any:
+        return (
+            "diagnose-agent: the --braintrust-* and --langsmith-* flags are "
+            "mutually exclusive — pick one platform."
         )
     if bt_exp and bt_proj:
         return (
@@ -434,11 +562,18 @@ def _validate_agent_source(
         )
     if bt_latest and not bt_proj:
         return "diagnose-agent: --latest requires --braintrust-project."
-    if not (bt_exp or bt_proj) and eval_result is None:
+    if ls_exp and ls_proj:
         return (
-            "diagnose-agent requires a source: --eval-result FILE, or "
-            "--braintrust-experiment-id ID, or --braintrust-project NAME "
-            "--latest."
+            "diagnose-agent: --langsmith-experiment-id and "
+            "--langsmith-project are mutually exclusive."
+        )
+    if not bt_any and not ls_any and eval_result is None:
+        return (
+            "diagnose-agent requires a source: --eval-result FILE, a "
+            "--braintrust-* source (--braintrust-experiment-id ID, or "
+            "--braintrust-project NAME --latest), or a --langsmith-* "
+            "source (--langsmith-experiment-id ID, or --langsmith-project "
+            "NAME)."
         )
     return None
 
@@ -484,6 +619,23 @@ def _run_agent_diagnose_live(args: argparse.Namespace) -> int:
             print(f"  body: {e.body[:500]}", file=sys.stderr)
         return 3
 
+    return _stage_and_run_agent_diagnose(args, container)
+
+
+def _stage_and_run_agent_diagnose(
+    args: argparse.Namespace, container: dict
+) -> int:
+    """Stage a live-fetched container to a temp file and run
+    agent-researcher on it.
+
+    Shared by the Braintrust and LangSmith live paths: the converted
+    container is the same JSON shape agent-researcher's loader reads
+    from --eval-result, so it is written to a per-run temp file and fed
+    through the existing runner unchanged. Neither live path uses the
+    input-hash cache — a live pull is keyed on an experiment/project id,
+    not file contents, and the temp path is per-run, so a cache entry
+    could never hit; --no-cache/--force are inert here.
+    """
     tmp = tempfile.NamedTemporaryFile(
         "w", suffix=".json", delete=False, encoding="utf-8"
     )
@@ -506,6 +658,35 @@ def _run_agent_diagnose_live(args: argparse.Namespace) -> int:
         except OSError:
             pass
     return result.exit_code
+
+
+def _run_agent_diagnose_live_langsmith(args: argparse.Namespace) -> int:
+    """Pull live LangSmith runs (workflow A or B), convert, and run
+    agent-researcher. Mirrors the Braintrust live path; the shared
+    ``fetch_runs_as_failing_evals`` helper picks the workflow."""
+    try:
+        container = fetch_runs_as_failing_evals(
+            experiment_id=args.langsmith_experiment_id,
+            project=args.langsmith_project,
+            filter_expression=args.filter,
+            primary_feedback_key=args.primary_feedback_key,
+            threshold=args.threshold,
+            reference_feedback_key=args.reference_feedback_key,
+            max_tree_depth=args.max_tree_depth,
+            max_total_nodes=args.max_total_nodes,
+            agent_revision=args.agent_revision,
+            api_key=args.langsmith_api_key,
+            base_url=args.langsmith_base_url,
+        )
+    except LangSmithAPIError as e:
+        print(f"LangSmith API error: {e}", file=sys.stderr)
+        if e.status:
+            print(f"  status: {e.status}", file=sys.stderr)
+        if e.body:
+            print(f"  body: {e.body[:500]}", file=sys.stderr)
+        return 3
+
+    return _stage_and_run_agent_diagnose(args, container)
 
 
 def _run_inferred(args: argparse.Namespace, *, verb: str) -> int:

@@ -1,0 +1,313 @@
+{
+  "experiment_id": "support-agent-prod",
+  "experiment_name": "support-agent-prod",
+  "project_name": "support-agent-prod",
+  "agent_revision": null,
+  "total": 15,
+  "passed": 10,
+  "pass_rate": 0.6667,
+  "threshold": 1.0,
+  "meets_threshold": false,
+  "results": [
+    {
+      "scenario_id": "r02",
+      "expected": "unknown",
+      "predicted": "{\"answer\":\"Try a different browser.\"}",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "user_thumb",
+      "scorer_signature": {
+        "user_thumb": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        }
+      },
+      "spans": [
+        {
+          "span_id": "r02",
+          "parent_span_id": null,
+          "name": "agent_turn",
+          "run_type": "chain",
+          "input": {
+            "q": "the export button does nothing"
+          },
+          "output": {
+            "answer": "Try a different browser."
+          },
+          "error": null,
+          "start": "2026-05-12T10:00:05Z",
+          "end": "2026-05-12T10:00:09Z"
+        },
+        {
+          "span_id": "r02c1",
+          "parent_span_id": "r02",
+          "name": "plan",
+          "run_type": "chain",
+          "input": {
+            "q": "the export button does nothing"
+          },
+          "output": {
+            "plan": "diagnose UI"
+          },
+          "error": null,
+          "start": "2026-05-12T10:00:05Z",
+          "end": "2026-05-12T10:00:06Z"
+        },
+        {
+          "span_id": "r02c2",
+          "parent_span_id": "r02",
+          "name": "act",
+          "run_type": "chain",
+          "input": {
+            "plan": "diagnose UI"
+          },
+          "output": {
+            "answer": "Try a different browser."
+          },
+          "error": null,
+          "start": "2026-05-12T10:00:06Z",
+          "end": "2026-05-12T10:00:09Z"
+        },
+        {
+          "span_id": "r02c3",
+          "parent_span_id": "r02c2",
+          "name": "kb_search_tool",
+          "run_type": "tool",
+          "input": {
+            "query": "export button"
+          },
+          "output": {
+            "results": []
+          },
+          "error": "ToolError: knowledge base returned 0 results; agent fell back to a generic browser suggestion instead of escalating",
+          "start": "2026-05-12T10:00:07Z",
+          "end": "2026-05-12T10:00:08Z"
+        }
+      ],
+      "input": {
+        "q": "the export button does nothing"
+      },
+      "output": {
+        "answer": "Try a different browser."
+      },
+      "notes": "LangSmith project run r02 in project 'support-agent-prod': scorer 'user_thumb' scored 0.0 (threshold 1.0). expected='unknown' predicted='{\"answer\":\"Try a different browser.\"}'.",
+      "metadata": {
+        "run_id": "r02",
+        "trace_id": "p02",
+        "project_name": "support-agent-prod",
+        "experiment_id": "support-agent-prod",
+        "experiment_name": "support-agent-prod",
+        "workflow": "project"
+      },
+      "created": "2026-05-12T10:00:05Z"
+    },
+    {
+      "scenario_id": "r05",
+      "expected": "unknown",
+      "predicted": "{\"answer\":\"Charges look correct on our end.\"}",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "correctness",
+      "scorer_signature": {
+        "correctness": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "reference_answer": {
+          "score": null,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "spans": [
+        {
+          "span_id": "r05",
+          "parent_span_id": null,
+          "name": "agent_turn",
+          "run_type": "chain",
+          "input": {
+            "q": "I was charged twice"
+          },
+          "output": {
+            "answer": "Charges look correct on our end."
+          },
+          "error": null,
+          "start": "2026-05-12T10:00:18Z",
+          "end": "2026-05-12T10:00:21Z"
+        }
+      ],
+      "input": {
+        "q": "I was charged twice"
+      },
+      "output": {
+        "answer": "Charges look correct on our end."
+      },
+      "notes": "LangSmith project run r05 in project 'support-agent-prod': scorer 'correctness' scored 0.0 (threshold 1.0). expected='unknown' predicted='{\"answer\":\"Charges look correct on our end.\"}'.",
+      "metadata": {
+        "run_id": "r05",
+        "trace_id": "p05",
+        "project_name": "support-agent-prod",
+        "experiment_id": "support-agent-prod",
+        "experiment_name": "support-agent-prod",
+        "workflow": "project"
+      },
+      "created": "2026-05-12T10:00:18Z"
+    },
+    {
+      "scenario_id": "r08",
+      "expected": "unknown",
+      "predicted": "{\"answer\":\"There are no rate limits.\"}",
+      "predicted_confidence": 0.4,
+      "passed": false,
+      "score": 0.4,
+      "scorer": "groundedness",
+      "scorer_signature": {
+        "groundedness": {
+          "score": 0.4,
+          "passed": false,
+          "is_primary": true
+        }
+      },
+      "spans": [
+        {
+          "span_id": "r08",
+          "parent_span_id": null,
+          "name": "agent_turn",
+          "run_type": "chain",
+          "input": {
+            "q": "explain the rate limits"
+          },
+          "output": {
+            "answer": "There are no rate limits."
+          },
+          "error": null,
+          "start": "2026-05-12T10:00:30Z",
+          "end": "2026-05-12T10:00:33Z"
+        }
+      ],
+      "input": {
+        "q": "explain the rate limits"
+      },
+      "output": {
+        "answer": "There are no rate limits."
+      },
+      "notes": "LangSmith project run r08 in project 'support-agent-prod': scorer 'groundedness' scored 0.4 (threshold 1.0). expected='unknown' predicted='{\"answer\":\"There are no rate limits.\"}'.",
+      "metadata": {
+        "run_id": "r08",
+        "trace_id": "p08",
+        "project_name": "support-agent-prod",
+        "experiment_id": "support-agent-prod",
+        "experiment_name": "support-agent-prod",
+        "workflow": "project"
+      },
+      "created": "2026-05-12T10:00:30Z"
+    },
+    {
+      "scenario_id": "r11",
+      "expected": "unknown",
+      "predicted": "{\"answer\":\"Webhooks are unaffected by migrations.\"}",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "correctness",
+      "scorer_signature": {
+        "correctness": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "helpfulness": {
+          "score": 0.6,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "spans": [
+        {
+          "span_id": "r11",
+          "parent_span_id": null,
+          "name": "agent_turn",
+          "run_type": "chain",
+          "input": {
+            "q": "my webhook stopped firing after the migration"
+          },
+          "output": {
+            "answer": "Webhooks are unaffected by migrations."
+          },
+          "error": null,
+          "start": "2026-05-12T10:00:42Z",
+          "end": "2026-05-12T10:00:46Z"
+        }
+      ],
+      "input": {
+        "q": "my webhook stopped firing after the migration"
+      },
+      "output": {
+        "answer": "Webhooks are unaffected by migrations."
+      },
+      "notes": "LangSmith project run r11 in project 'support-agent-prod': scorer 'correctness' scored 0.0 (threshold 1.0). expected='unknown' predicted='{\"answer\":\"Webhooks are unaffected by migrations.\"}'.",
+      "metadata": {
+        "run_id": "r11",
+        "trace_id": "p11",
+        "project_name": "support-agent-prod",
+        "experiment_id": "support-agent-prod",
+        "experiment_name": "support-agent-prod",
+        "workflow": "project"
+      },
+      "created": "2026-05-12T10:00:42Z"
+    },
+    {
+      "scenario_id": "r14",
+      "expected": "unknown",
+      "predicted": "{\"answer\":\"Cancellation is immediate, there should be no charge.\"}",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "user_thumb",
+      "scorer_signature": {
+        "user_thumb": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        }
+      },
+      "spans": [
+        {
+          "span_id": "r14",
+          "parent_span_id": null,
+          "name": "agent_turn",
+          "run_type": "chain",
+          "input": {
+            "q": "you billed me after I cancelled last month"
+          },
+          "output": {
+            "answer": "Cancellation is immediate, there should be no charge."
+          },
+          "error": null,
+          "start": "2026-05-12T10:00:55Z",
+          "end": "2026-05-12T10:00:58Z"
+        }
+      ],
+      "input": {
+        "q": "you billed me after I cancelled last month"
+      },
+      "output": {
+        "answer": "Cancellation is immediate, there should be no charge."
+      },
+      "notes": "LangSmith project run r14 in project 'support-agent-prod': scorer 'user_thumb' scored 0.0 (threshold 1.0). expected='unknown' predicted='{\"answer\":\"Cancellation is immediate, there should be no charge.\"}'.",
+      "metadata": {
+        "run_id": "r14",
+        "trace_id": "p14",
+        "project_name": "support-agent-prod",
+        "experiment_id": "support-agent-prod",
+        "experiment_name": "support-agent-prod",
+        "workflow": "project"
+      },
+      "created": "2026-05-12T10:00:55Z"
+    }
+  ]
+}

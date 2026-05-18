@@ -1,0 +1,59 @@
+{
+  "_fixture_doc": "Workflow A — LangSmith Dataset-Experiment. Hand-authored to the verified LangSmith REST shapes (Run / Feedback / Example, May 2026 SDK), not captured live. `runs` is what list_runs(project_id=<experiment>, is_root=True) yields; `children` is what list_runs(parent_run_id=<id>) yields per level; `feedback` is what list_feedback(run_ids=[...]) yields (separate resource, not inline on runs); `examples` is what read_example(<reference_example_id>) returns. 10 root runs, 3 failing on the `correctness` scorer (r03, r07, r09); r03 carries a depth-2 run tree with an error-bearing deep node.",
+  "experiment_id": "exp-routing-classifier-v3",
+  "runs": [
+    {"id": "r01", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "I was double charged this month"}, "outputs": {"intent": "billing"}, "start_time": "2026-05-10T09:00:01Z", "end_time": "2026-05-10T09:00:03Z", "error": null, "parent_run_id": null, "trace_id": "t01", "reference_example_id": "ex01", "tags": ["prod-eval"], "extra": {}},
+    {"id": "r02", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "How do I rotate my API key?"}, "outputs": {"intent": "technical_support"}, "start_time": "2026-05-10T09:00:05Z", "end_time": "2026-05-10T09:00:07Z", "error": null, "parent_run_id": null, "trace_id": "t02", "reference_example_id": "ex02", "tags": ["prod-eval"], "extra": {}},
+    {"id": "r03", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "Cancel my subscription, I was billed after cancelling"}, "outputs": {"intent": "account_management"}, "start_time": "2026-05-10T09:00:09Z", "end_time": "2026-05-10T09:00:12Z", "error": null, "parent_run_id": null, "trace_id": "t03", "reference_example_id": "ex03", "tags": ["prod-eval"], "extra": {}, "child_run_ids": ["r03c1", "r03c2", "r03c4"]},
+    {"id": "r04", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "The dashboard graph is blank"}, "outputs": {"intent": "technical_support"}, "start_time": "2026-05-10T09:00:14Z", "end_time": "2026-05-10T09:00:16Z", "error": null, "parent_run_id": null, "trace_id": "t04", "reference_example_id": "ex04", "tags": ["prod-eval"], "extra": {}},
+    {"id": "r05", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "Do you offer volume discounts?"}, "outputs": {"intent": "sales"}, "start_time": "2026-05-10T09:00:18Z", "end_time": "2026-05-10T09:00:20Z", "error": null, "parent_run_id": null, "trace_id": "t05", "reference_example_id": "ex05", "tags": ["prod-eval"], "extra": {}},
+    {"id": "r06", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "Reset my password"}, "outputs": {"intent": "account_management"}, "start_time": "2026-05-10T09:00:22Z", "end_time": "2026-05-10T09:00:24Z", "error": null, "parent_run_id": null, "trace_id": "t06", "reference_example_id": "ex06", "tags": ["prod-eval"], "extra": {}},
+    {"id": "r07", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "Your SDK throws on null tax IDs"}, "outputs": {"intent": "general_inquiry"}, "start_time": "2026-05-10T09:00:26Z", "end_time": "2026-05-10T09:00:28Z", "error": null, "parent_run_id": null, "trace_id": "t07", "reference_example_id": "ex07", "tags": ["prod-eval"], "extra": {}},
+    {"id": "r08", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "Upgrade me to the team plan"}, "outputs": {"intent": "sales"}, "start_time": "2026-05-10T09:00:30Z", "end_time": "2026-05-10T09:00:32Z", "error": null, "parent_run_id": null, "trace_id": "t08", "reference_example_id": "ex08", "tags": ["prod-eval"], "extra": {}},
+    {"id": "r09", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "I need a refund for the duplicate charge"}, "outputs": {"intent": "general_inquiry"}, "start_time": "2026-05-10T09:00:34Z", "end_time": "2026-05-10T09:00:36Z", "error": null, "parent_run_id": null, "trace_id": "t09", "reference_example_id": "ex09", "tags": ["prod-eval"], "extra": {}},
+    {"id": "r10", "name": "route_support_ticket", "run_type": "chain", "inputs": {"ticket": "Where are your servers hosted?"}, "outputs": {"intent": "general_inquiry"}, "start_time": "2026-05-10T09:00:38Z", "end_time": "2026-05-10T09:00:40Z", "error": null, "parent_run_id": null, "trace_id": "t10", "reference_example_id": "ex10", "tags": ["prod-eval"], "extra": {}}
+  ],
+  "children": {
+    "r03": [
+      {"id": "r03c1", "name": "retrieve_account_context", "run_type": "retriever", "inputs": {"customer_id": "cust_8842"}, "outputs": {"docs": 3}, "start_time": "2026-05-10T09:00:09Z", "end_time": "2026-05-10T09:00:10Z", "error": null, "parent_run_id": "r03", "trace_id": "t03"},
+      {"id": "r03c2", "name": "classify_intent", "run_type": "chain", "inputs": {"ticket": "Cancel my subscription, I was billed after cancelling"}, "outputs": {"intent": "account_management"}, "start_time": "2026-05-10T09:00:10Z", "end_time": "2026-05-10T09:00:11Z", "error": null, "parent_run_id": "r03", "trace_id": "t03"},
+      {"id": "r03c4", "name": "format_response", "run_type": "chain", "inputs": {"intent": "account_management"}, "outputs": {"reply": "..."}, "start_time": "2026-05-10T09:00:11Z", "end_time": "2026-05-10T09:00:12Z", "error": null, "parent_run_id": "r03", "trace_id": "t03"}
+    ],
+    "r03c2": [
+      {"id": "r03c3", "name": "llm_classify", "run_type": "llm", "inputs": {"prompt": "Classify the ticket. Return JSON {intent}."}, "outputs": {"raw": "{\"label\": \"account_management\"}"}, "start_time": "2026-05-10T09:00:10Z", "end_time": "2026-05-10T09:00:11Z", "error": "KeyError: post-processor read 'intent' but the model emitted 'label'; billing-vs-account_management collapsed to account_management", "parent_run_id": "r03c2", "trace_id": "t03"}
+    ],
+    "r03c4": [
+      {"id": "r03c5", "name": "log_metrics", "run_type": "tool", "inputs": {"intent": "account_management"}, "outputs": {"ok": true}, "start_time": "2026-05-10T09:00:11Z", "end_time": "2026-05-10T09:00:12Z", "error": null, "parent_run_id": "r03c4", "trace_id": "t03"}
+    ]
+  },
+  "feedback": [
+    {"id": "fb01a", "run_id": "r01", "key": "correctness", "score": 1.0, "value": null, "comment": "exact match", "created_at": "2026-05-10T09:05:00Z"},
+    {"id": "fb01b", "run_id": "r01", "key": "factuality", "score": 1.0, "value": null, "comment": null, "created_at": "2026-05-10T09:05:00Z"},
+    {"id": "fb02a", "run_id": "r02", "key": "correctness", "score": 1.0, "value": null, "comment": null, "created_at": "2026-05-10T09:05:01Z"},
+    {"id": "fb02b", "run_id": "r02", "key": "helpfulness", "score": 0.8, "value": null, "comment": null, "created_at": "2026-05-10T09:05:01Z"},
+    {"id": "fb03a", "run_id": "r03", "key": "correctness", "score": 0.0, "value": null, "comment": "expected billing, got account_management", "created_at": "2026-05-10T09:05:02Z"},
+    {"id": "fb03b", "run_id": "r03", "key": "factuality", "score": 1.0, "value": null, "comment": "facts fine, label wrong", "created_at": "2026-05-10T09:05:02Z"},
+    {"id": "fb03c", "run_id": "r03", "key": "helpfulness", "score": 0.5, "value": null, "comment": null, "created_at": "2026-05-10T09:05:02Z"},
+    {"id": "fb04a", "run_id": "r04", "key": "correctness", "score": 1.0, "value": null, "comment": null, "created_at": "2026-05-10T09:05:03Z"},
+    {"id": "fb05a", "run_id": "r05", "key": "correctness", "score": 1.0, "value": null, "comment": null, "created_at": "2026-05-10T09:05:04Z"},
+    {"id": "fb06a", "run_id": "r06", "key": "correctness", "score": 1.0, "value": null, "comment": null, "created_at": "2026-05-10T09:05:05Z"},
+    {"id": "fb07a", "run_id": "r07", "key": "correctness", "score": 0.0, "value": null, "comment": "expected technical_support, got general_inquiry", "created_at": "2026-05-10T09:05:06Z"},
+    {"id": "fb07b", "run_id": "r07", "key": "factuality", "score": 0.0, "value": null, "comment": "missed the SDK bug report entirely", "created_at": "2026-05-10T09:05:06Z"},
+    {"id": "fb08a", "run_id": "r08", "key": "correctness", "score": 1.0, "value": null, "comment": null, "created_at": "2026-05-10T09:05:07Z"},
+    {"id": "fb09a", "run_id": "r09", "key": "correctness", "score": 0.0, "value": null, "comment": "expected billing, got general_inquiry", "created_at": "2026-05-10T09:05:08Z"},
+    {"id": "fb09b", "run_id": "r09", "key": "helpfulness", "score": 0.3, "value": null, "comment": null, "created_at": "2026-05-10T09:05:08Z"},
+    {"id": "fb10a", "run_id": "r10", "key": "correctness", "score": 1.0, "value": null, "comment": null, "created_at": "2026-05-10T09:05:09Z"}
+  ],
+  "examples": {
+    "ex01": {"id": "ex01", "dataset_id": "ds-routing", "inputs": {"ticket": "I was double charged this month"}, "outputs": {"intent": "billing"}, "metadata": {}},
+    "ex02": {"id": "ex02", "dataset_id": "ds-routing", "inputs": {"ticket": "How do I rotate my API key?"}, "outputs": {"intent": "technical_support"}, "metadata": {}},
+    "ex03": {"id": "ex03", "dataset_id": "ds-routing", "inputs": {"ticket": "Cancel my subscription, I was billed after cancelling"}, "outputs": {"intent": "billing"}, "metadata": {}},
+    "ex04": {"id": "ex04", "dataset_id": "ds-routing", "inputs": {"ticket": "The dashboard graph is blank"}, "outputs": {"intent": "technical_support"}, "metadata": {}},
+    "ex05": {"id": "ex05", "dataset_id": "ds-routing", "inputs": {"ticket": "Do you offer volume discounts?"}, "outputs": {"intent": "sales"}, "metadata": {}},
+    "ex06": {"id": "ex06", "dataset_id": "ds-routing", "inputs": {"ticket": "Reset my password"}, "outputs": {"intent": "account_management"}, "metadata": {}},
+    "ex07": {"id": "ex07", "dataset_id": "ds-routing", "inputs": {"ticket": "Your SDK throws on null tax IDs"}, "outputs": {"intent": "technical_support"}, "metadata": {}},
+    "ex08": {"id": "ex08", "dataset_id": "ds-routing", "inputs": {"ticket": "Upgrade me to the team plan"}, "outputs": {"intent": "sales"}, "metadata": {}},
+    "ex09": {"id": "ex09", "dataset_id": "ds-routing", "inputs": {"ticket": "I need a refund for the duplicate charge"}, "outputs": {"intent": "billing"}, "metadata": {}},
+    "ex10": {"id": "ex10", "dataset_id": "ds-routing", "inputs": {"ticket": "Where are your servers hosted?"}, "outputs": {"intent": "general_inquiry"}, "metadata": {}}
+  }
+}

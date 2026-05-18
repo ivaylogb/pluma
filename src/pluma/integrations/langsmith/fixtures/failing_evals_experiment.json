@@ -1,0 +1,255 @@
+{
+  "experiment_id": "exp-routing-classifier-v3",
+  "experiment_name": "exp-routing-classifier-v3",
+  "project_name": "exp-routing-classifier-v3",
+  "agent_revision": null,
+  "total": 10,
+  "passed": 7,
+  "pass_rate": 0.7,
+  "threshold": 1.0,
+  "meets_threshold": false,
+  "results": [
+    {
+      "scenario_id": "ex03",
+      "expected": "{\"intent\":\"billing\"}",
+      "predicted": "{\"intent\":\"account_management\"}",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "correctness",
+      "scorer_signature": {
+        "correctness": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "factuality": {
+          "score": 1.0,
+          "passed": true,
+          "is_primary": false
+        },
+        "helpfulness": {
+          "score": 0.5,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "spans": [
+        {
+          "span_id": "r03",
+          "parent_span_id": null,
+          "name": "route_support_ticket",
+          "run_type": "chain",
+          "input": {
+            "ticket": "Cancel my subscription, I was billed after cancelling"
+          },
+          "output": {
+            "intent": "account_management"
+          },
+          "error": null,
+          "start": "2026-05-10T09:00:09Z",
+          "end": "2026-05-10T09:00:12Z"
+        },
+        {
+          "span_id": "r03c1",
+          "parent_span_id": "r03",
+          "name": "retrieve_account_context",
+          "run_type": "retriever",
+          "input": {
+            "customer_id": "cust_8842"
+          },
+          "output": {
+            "docs": 3
+          },
+          "error": null,
+          "start": "2026-05-10T09:00:09Z",
+          "end": "2026-05-10T09:00:10Z"
+        },
+        {
+          "span_id": "r03c2",
+          "parent_span_id": "r03",
+          "name": "classify_intent",
+          "run_type": "chain",
+          "input": {
+            "ticket": "Cancel my subscription, I was billed after cancelling"
+          },
+          "output": {
+            "intent": "account_management"
+          },
+          "error": null,
+          "start": "2026-05-10T09:00:10Z",
+          "end": "2026-05-10T09:00:11Z"
+        },
+        {
+          "span_id": "r03c4",
+          "parent_span_id": "r03",
+          "name": "format_response",
+          "run_type": "chain",
+          "input": {
+            "intent": "account_management"
+          },
+          "output": {
+            "reply": "..."
+          },
+          "error": null,
+          "start": "2026-05-10T09:00:11Z",
+          "end": "2026-05-10T09:00:12Z"
+        },
+        {
+          "span_id": "r03c3",
+          "parent_span_id": "r03c2",
+          "name": "llm_classify",
+          "run_type": "llm",
+          "input": {
+            "prompt": "Classify the ticket. Return JSON {intent}."
+          },
+          "output": {
+            "raw": "{\"label\": \"account_management\"}"
+          },
+          "error": "KeyError: post-processor read 'intent' but the model emitted 'label'; billing-vs-account_management collapsed to account_management",
+          "start": "2026-05-10T09:00:10Z",
+          "end": "2026-05-10T09:00:11Z"
+        },
+        {
+          "span_id": "r03c5",
+          "parent_span_id": "r03c4",
+          "name": "log_metrics",
+          "run_type": "tool",
+          "input": {
+            "intent": "account_management"
+          },
+          "output": {
+            "ok": true
+          },
+          "error": null,
+          "start": "2026-05-10T09:00:11Z",
+          "end": "2026-05-10T09:00:12Z"
+        }
+      ],
+      "input": {
+        "ticket": "Cancel my subscription, I was billed after cancelling"
+      },
+      "output": {
+        "intent": "account_management"
+      },
+      "notes": "LangSmith experiment run r03 in project 'exp-routing-classifier-v3': scorer 'correctness' scored 0.0 (threshold 1.0). expected='{\"intent\":\"billing\"}' predicted='{\"intent\":\"account_management\"}'.",
+      "metadata": {
+        "run_id": "r03",
+        "trace_id": "t03",
+        "project_name": "exp-routing-classifier-v3",
+        "experiment_id": "exp-routing-classifier-v3",
+        "experiment_name": "exp-routing-classifier-v3",
+        "workflow": "experiment"
+      },
+      "created": "2026-05-10T09:00:09Z"
+    },
+    {
+      "scenario_id": "ex07",
+      "expected": "{\"intent\":\"technical_support\"}",
+      "predicted": "{\"intent\":\"general_inquiry\"}",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "correctness",
+      "scorer_signature": {
+        "correctness": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "factuality": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "spans": [
+        {
+          "span_id": "r07",
+          "parent_span_id": null,
+          "name": "route_support_ticket",
+          "run_type": "chain",
+          "input": {
+            "ticket": "Your SDK throws on null tax IDs"
+          },
+          "output": {
+            "intent": "general_inquiry"
+          },
+          "error": null,
+          "start": "2026-05-10T09:00:26Z",
+          "end": "2026-05-10T09:00:28Z"
+        }
+      ],
+      "input": {
+        "ticket": "Your SDK throws on null tax IDs"
+      },
+      "output": {
+        "intent": "general_inquiry"
+      },
+      "notes": "LangSmith experiment run r07 in project 'exp-routing-classifier-v3': scorer 'correctness' scored 0.0 (threshold 1.0). expected='{\"intent\":\"technical_support\"}' predicted='{\"intent\":\"general_inquiry\"}'.",
+      "metadata": {
+        "run_id": "r07",
+        "trace_id": "t07",
+        "project_name": "exp-routing-classifier-v3",
+        "experiment_id": "exp-routing-classifier-v3",
+        "experiment_name": "exp-routing-classifier-v3",
+        "workflow": "experiment"
+      },
+      "created": "2026-05-10T09:00:26Z"
+    },
+    {
+      "scenario_id": "ex09",
+      "expected": "{\"intent\":\"billing\"}",
+      "predicted": "{\"intent\":\"general_inquiry\"}",
+      "predicted_confidence": 0.0,
+      "passed": false,
+      "score": 0.0,
+      "scorer": "correctness",
+      "scorer_signature": {
+        "correctness": {
+          "score": 0.0,
+          "passed": false,
+          "is_primary": true
+        },
+        "helpfulness": {
+          "score": 0.3,
+          "passed": false,
+          "is_primary": false
+        }
+      },
+      "spans": [
+        {
+          "span_id": "r09",
+          "parent_span_id": null,
+          "name": "route_support_ticket",
+          "run_type": "chain",
+          "input": {
+            "ticket": "I need a refund for the duplicate charge"
+          },
+          "output": {
+            "intent": "general_inquiry"
+          },
+          "error": null,
+          "start": "2026-05-10T09:00:34Z",
+          "end": "2026-05-10T09:00:36Z"
+        }
+      ],
+      "input": {
+        "ticket": "I need a refund for the duplicate charge"
+      },
+      "output": {
+        "intent": "general_inquiry"
+      },
+      "notes": "LangSmith experiment run r09 in project 'exp-routing-classifier-v3': scorer 'correctness' scored 0.0 (threshold 1.0). expected='{\"intent\":\"billing\"}' predicted='{\"intent\":\"general_inquiry\"}'.",
+      "metadata": {
+        "run_id": "r09",
+        "trace_id": "t09",
+        "project_name": "exp-routing-classifier-v3",
+        "experiment_id": "exp-routing-classifier-v3",
+        "experiment_name": "exp-routing-classifier-v3",
+        "workflow": "experiment"
+      },
+      "created": "2026-05-10T09:00:34Z"
+    }
+  ]
+}
