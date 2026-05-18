@@ -101,6 +101,59 @@ Pluma's HTTP API surface is defined by an OpenAPI 3.1.0 spec (canonical source: 
 
 This repo is the canonical implementation: CLI orchestrator, integrations, FastAPI server, and the spec the SDKs derive from.
 
+The server in `src/pluma/api/` implements a single `Job` resource
+(`POST /v1/jobs`, `GET /v1/jobs/{id}`, `DELETE /v1/jobs/{id}`,
+`GET /v1/jobs/{id}/findings`) plus an unauthenticated `GET /v1/healthz`.
+v0.1 populates the `FailingEvalContainer` honestly: `category` is always
+`measurement_instrument`, `applyable` is always `false`, and `edit` is
+always `null`; PostHog support is v0.2, so a PostHog source fails the job
+with a structured `not_implemented` (surfaced as HTTP 501). See the
+"API v0.1 capability vs schema" table in the spec's `info.description`.
+
+Install the optional API extra:
+
+```bash
+pip install -e ".[api]"      # FastAPI + uvicorn + pydantic
+```
+
+### Running the server
+
+The server binds **loopback only** (`127.0.0.1:8000`) — that loopback
+boundary is the real security control; the `X-Pluma-Key` check exists for
+spec compliance and non-loopback deployments.
+
+Docker (the default deployment):
+
+```bash
+docker build -f Dockerfile.api -t pluma-api .
+docker run -p 127.0.0.1:8000:8000 pluma-api
+```
+
+Or directly:
+
+```bash
+python -m pluma.api          # or the `pluma-api` console script
+```
+
+**The API key is generated at startup and printed once to stderr** (with
+Docker, read it from `docker logs <container>`). It is persisted to
+`/var/lib/pluma/key` inside the container, or `~/.pluma/key` otherwise, so
+restarts reuse the same key. Send it on every request except
+`GET /v1/healthz`:
+
+```bash
+KEY=plm_...                  # copied from the stderr line at startup
+curl -s http://127.0.0.1:8000/v1/healthz                       # no key needed
+curl -s -X POST http://127.0.0.1:8000/v1/jobs \
+     -H "X-Pluma-Key: $KEY" \
+     -H 'Content-Type: application/json' \
+     -d '{"sources":[{"type":"braintrust","experiment_id":"exp_abc123"}]}'
+```
+
+To pin a fixed key instead of the generated one (CI, integration tests,
+fixed deployments), set `PLUMA_API_KEY` in the server's environment; that
+value is then the key clients send in the `X-Pluma-Key` header.
+
 ## Install
 
 ```bash

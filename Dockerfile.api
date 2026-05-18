@@ -1,0 +1,44 @@
+# Pluma HTTP API — multi-stage build.
+#
+# The server binds 127.0.0.1:8000 (loopback only): the default deployment
+# treats loopback as the security boundary. Run with an explicit loopback
+# publish so Docker doesn't widen it:
+#
+#     docker build -f Dockerfile.api -t pluma-api .
+#     docker run -p 127.0.0.1:8000:8000 pluma-api
+#
+# The API key is generated at startup and printed once to the container's
+# stderr; read it from `docker logs`.
+
+# ---- builder ----------------------------------------------------------
+FROM python:3.11-slim AS builder
+
+# git is needed because pluma's runtime deps (the three sister tools) are
+# git+https requirements; it is not carried into the final image.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY . /src
+
+# Install pluma + the [api] extra from local source into an isolated
+# prefix we copy into the slim final image.
+RUN pip install --no-cache-dir --prefix=/install ".[api]"
+
+# ---- final ------------------------------------------------------------
+FROM python:3.11-slim AS final
+
+COPY --from=builder /install /usr/local
+
+# Persisted API-key location inside the container (see auth.py).
+RUN mkdir -p /var/lib/pluma
+
+# Build-time guard: fail the build if the server is not loopback-bound.
+RUN python -c "import pluma.api.__main__ as m; \
+assert m.HOST == '127.0.0.1', f'expected loopback bind, got {m.HOST}'; \
+print(f'[build] verified loopback binding: {m.HOST}:{m.PORT}')"
+
+EXPOSE 8000
+
+CMD ["python", "-m", "pluma.api"]

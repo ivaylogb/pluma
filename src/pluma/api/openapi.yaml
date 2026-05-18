@@ -1,0 +1,914 @@
+# Canonical OpenAPI spec for Pluma's HTTP API. Source of truth — Stainless SDKs derive from this file.
+openapi: 3.1.0
+
+info:
+  title: Pluma Diagnostic API
+  version: 0.1.0
+  summary: Diagnose LLM-mediated system failures from eval and observability data.
+  description: |
+    Pluma reads failing rows from eval and observability platforms (Braintrust,
+    LangSmith, PostHog) and surfaces them as structured findings against the
+    [agent-diagnosis-spec v0.2](https://github.com/ivaylogb/agent-diagnosis-spec)
+    `FailingEvalContainer` schema.
+
+    Each finding carries a claim and a category, with optional `file:line`
+    citation and an applyable edit. Findings are categorized into one of
+    four failure modes: `measurement_instrument`, `interface`,
+    `context_at_decision`, or `call_sequence`. See the v0.1 capability
+    section below for which fields are populated in the current version.
+
+    ## Resource model
+
+    The API exposes a single primary resource: `Job`. Create a diagnostic job
+    with `POST /v1/jobs`. Poll its state with `GET /v1/jobs/{job_id}`. Once
+    `status` is `completed`, fetch the findings sub-resource via
+    `GET /v1/jobs/{job_id}/findings`. Cancel in-flight jobs with
+    `DELETE /v1/jobs/{job_id}`.
+
+    Diagnostic runs are asynchronous because the underlying triage loop calls
+    out to an LLM and may take several minutes.
+
+    ## Auth
+
+    All requests except `GET /v1/healthz` require an API key in the
+    `X-Pluma-Key` header. The key is generated at server startup and printed
+    once to stderr.
+
+    ## Request IDs
+
+    Every response (success or error) includes an `X-Request-Id` header with a
+    unique identifier for the request. Error response bodies also include
+    `request_id` in the JSON. Include this ID when reporting issues.
+
+    ## API v0.1 capability vs schema
+
+    This API spec describes Pluma's full diagnostic-findings surface. Pluma
+    v0.1 implements a subset; some fields are present in the schema but
+    populated by future versions:
+
+    | Field on `FailingEval` | v0.1 behavior | v0.2 behavior |
+    |---|---|---|
+    | `eval_id` | populated | populated |
+    | `claim` | short source-data summary | full diagnostic claim |
+    | `category` | always `measurement_instrument` (accurate — v0.1 observes failing evals without deeper structural analysis) | one of four failure modes, inferred from structural diagnosis |
+    | `citation` | populated when source span metadata contains `file:line`; null otherwise | populated by structural diagnosis when applicable |
+    | `applyable` | always `false` in v0.1 | true when v0.2 produces a single-edit fix |
+    | `edit` | always `null` in v0.1 | populated when `applyable == true` |
+
+    v0.2 is unblocked by upstream work in `agent-researcher` to emit structured
+    Findings directly (rather than the current prose markdown output). Until
+    that lands, v0.1 ships only the fields it can truthfully populate.
+
+    `category: "measurement_instrument"` as the v0.1 default is accurate, not
+    a placeholder — every v0.1 finding genuinely sits at the
+    measurement-instrument layer (we observed a failing eval; we haven't yet
+    diagnosed why deeper in the stack).
+
+  contact:
+    name: Pluma
+    url: https://github.com/ivaylogb/pluma
+  license:
+    name: MIT
+    url: https://github.com/ivaylogb/pluma/blob/main/LICENSE
+
+servers:
+  - url: http://127.0.0.1:8000
+    description: Local Docker container (default binding).
+
+security:
+  - apiKey: []
+
+tags:
+  - name: jobs
+    description: |
+      Diagnostic jobs. Create, retrieve, cancel, and fetch findings.
+  - name: system
+    description: |
+      Server health and metadata. Unauthenticated.
+
+paths:
+
+  /v1/jobs:
+    post:
+      tags: [jobs]
+      operationId: createJob
+      summary: Create a new diagnostic job.
+      description: |
+        Accepts one or more eval/observability sources and queues a diagnostic
+        job. Returns immediately with a `job_id` and `status: "pending"`.
+
+        Poll `GET /v1/jobs/{job_id}` until status is `completed`, `failed`, or
+        `cancelled`. Then fetch findings via `GET /v1/jobs/{job_id}/findings`.
+
+        ## Idempotency
+
+        Submitting the same `Idempotency-Key` within 24 hours returns the
+        existing job with a `200 OK` response. First-time submissions return
+        `202 Accepted`. The status code itself signals whether the response
+        is a fresh creation or an idempotent replay.
+
+        Without an idempotency key, every call creates a new job.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobRequest'
+            examples:
+              braintrust_only:
+                summary: Single Braintrust experiment
+                value:
+                  sources:
+                    - type: braintrust
+                      experiment_id: exp_abc123
+                      primary_scorer: factuality
+              multi_source:
+                summary: Braintrust + LangSmith combined
+                value:
+                  sources:
+                    - type: braintrust
+                      experiment_id: exp_abc123
+                      primary_scorer: factuality
+                    - type: langsmith
+                      project_name: my-agent-prod
+                      filter: 'eq(feedback_key, "thumbs_down")'
+                  agent_revision: git-sha-abc123
+      responses:
+        '200':
+          description: |
+            Idempotent replay. A job with this `Idempotency-Key` already
+            exists; the response body is its current state.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        '202':
+          description: New job created and queued.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+              example:
+                job_id: job_01HPCZ5VB5AQ8H21W2T5EZYP
+                status: pending
+                created_at: '2026-05-18T12:00:00Z'
+                terminated_at: null
+                error: null
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        default:
+          $ref: '#/components/responses/InternalError'
+
+  /v1/jobs/{job_id}:
+    parameters:
+      - $ref: '#/components/parameters/JobIdParam'
+    get:
+      tags: [jobs]
+      operationId: retrieveJob
+      summary: Retrieve a diagnostic job.
+      description: |
+        Returns the current state of a diagnostic job. Use this endpoint to
+        poll until the job reaches a terminal status (`completed`, `failed`,
+        or `cancelled`).
+
+        Recommended polling interval is 2-5 seconds. The server does not
+        currently enforce rate limits but agents and SDKs should not poll
+        more aggressively than once per second.
+
+        The `error` field is non-null only when `status == "failed"`. For all
+        other statuses the field is null.
+      responses:
+        '200':
+          description: Job state retrieved.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+              examples:
+                pending:
+                  summary: Job not yet started
+                  value:
+                    job_id: job_01HPCZ5VB5AQ8H21W2T5EZYP
+                    status: pending
+                    created_at: '2026-05-18T12:00:00Z'
+                    terminated_at: null
+                    error: null
+                running:
+                  summary: Job in progress
+                  value:
+                    job_id: job_01HPCZ5VB5AQ8H21W2T5EZYP
+                    status: running
+                    created_at: '2026-05-18T12:00:00Z'
+                    terminated_at: null
+                    error: null
+                completed:
+                  summary: Job complete and findings available
+                  value:
+                    job_id: job_01HPCZ5VB5AQ8H21W2T5EZYP
+                    status: completed
+                    created_at: '2026-05-18T12:00:00Z'
+                    terminated_at: '2026-05-18T12:03:42Z'
+                    error: null
+                failed:
+                  summary: Job failed during execution
+                  value:
+                    job_id: job_01HPCZ5VB5AQ8H21W2T5EZYP
+                    status: failed
+                    created_at: '2026-05-18T12:00:00Z'
+                    terminated_at: '2026-05-18T12:01:15Z'
+                    error:
+                      code: source_fetch_failed
+                      message: Braintrust API returned 404 for experiment exp_abc123
+                      request_id: req_B7T7N835B1AX6A795C0TWB1E
+                      details:
+                        source_type: braintrust
+                        experiment_id: exp_abc123
+                cancelled:
+                  summary: Job cancelled before completion
+                  value:
+                    job_id: job_01HPCZ5VB5AQ8H21W2T5EZYP
+                    status: cancelled
+                    created_at: '2026-05-18T12:00:00Z'
+                    terminated_at: '2026-05-18T12:00:30Z'
+                    error: null
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags: [jobs]
+      operationId: cancelJob
+      summary: Cancel a diagnostic job.
+      description: |
+        Cancels a job in `pending` or `running` state. Returns the job with
+        status `cancelled`.
+
+        Cancelling a job already in a terminal state (`completed`, `failed`,
+        `cancelled`) is a no-op and returns the existing terminal state
+        without raising an error. The semantics are idempotent: calling
+        `DELETE` repeatedly is safe.
+      responses:
+        '200':
+          description: Job cancelled, or already in a terminal state.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/InternalError'
+
+  /v1/jobs/{job_id}/findings:
+    parameters:
+      - $ref: '#/components/parameters/JobIdParam'
+    get:
+      tags: [jobs]
+      operationId: retrieveJobFindings
+      summary: Retrieve findings for a completed diagnostic job.
+      description: |
+        Returns the structured findings for a completed job. The `findings`
+        field is a `FailingEvalContainer` matching the [agent-diagnosis-spec
+        v0.2](https://github.com/ivaylogb/agent-diagnosis-spec) schema.
+
+        Returns `409 Conflict` if the job is not yet in `completed` state.
+        Returns `410 Gone` if the job completed but findings have expired
+        (default retention: 24 hours from completion).
+      responses:
+        '200':
+          description: Findings retrieved. `status` is always `completed`.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobFindings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Job is not yet complete.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: job_not_complete
+                message: Job is in status 'running'. Wait for status 'completed' before fetching findings.
+                request_id: req_B7T7N835B1AX6A795C0TWB1E
+                details:
+                  job_id: job_01HPCZ5VB5AQ8H21W2T5EZYP
+                  current_status: running
+        '410':
+          description: Findings have expired and are no longer retrievable.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          $ref: '#/components/responses/InternalError'
+
+  /v1/healthz:
+    get:
+      tags: [system]
+      operationId: healthCheck
+      summary: Liveness probe.
+      description: |
+        Returns 200 if the server is alive. Does not require authentication.
+      security: []
+      responses:
+        '200':
+          description: Server is alive.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, version]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  version:
+                    type: string
+                    description: Pluma server version.
+                    example: 0.1.0
+
+components:
+
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-Pluma-Key
+      description: |
+        API key generated at server startup. Printed once to stderr on first
+        boot. Persisted in `/var/lib/pluma/key` inside the container.
+
+  headers:
+    RequestId:
+      description: |
+        Unique identifier for this request, ULID-formatted with a `req_`
+        prefix. Echoed back in error response bodies as `request_id`.
+        Include this value when reporting issues.
+      schema:
+        type: string
+        pattern: '^req_[0-9A-HJKMNP-TV-Z]{24}$'
+        example: req_B7T7N835B1AX6A795C0TWB1E
+
+  parameters:
+    JobIdParam:
+      name: job_id
+      in: path
+      required: true
+      description: Unique identifier for a diagnostic job.
+      schema:
+        $ref: '#/components/schemas/JobId'
+
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: |
+        Optional client-generated key for idempotent retries. If a request
+        with the same key arrives within 24 hours, the existing job is
+        returned with `200 OK`.
+
+        Keys are limited to ASCII alphanumerics, hyphens, and underscores.
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9_-]+$'
+        minLength: 1
+        maxLength: 64
+        example: client-retry-abc123
+
+  schemas:
+
+    JobId:
+      type: string
+      pattern: '^job_[0-9A-HJKMNP-TV-Z]{24}$'
+      description: |
+        Stable identifier for a diagnostic job. ULID-formatted with a `job_`
+        prefix and Crockford base32 encoding (no ambiguous characters).
+      example: job_01HPCZ5VB5AQ8H21W2T5EZYP
+
+    CreateJobRequest:
+      type: object
+      required: [sources]
+      properties:
+        sources:
+          type: array
+          minItems: 1
+          maxItems: 10
+          description: |
+            One or more eval/observability sources to diagnose. At least one
+            source is required. Multiple sources are processed together as a
+            single diagnostic run.
+          items:
+            $ref: '#/components/schemas/Source'
+        agent_revision:
+          type: string
+          maxLength: 64
+          description: |
+            Optional git SHA, version tag, or other revision identifier for
+            the agent being diagnosed. When provided, this value overrides
+            any agent revision auto-resolved from source metadata
+            (e.g., Braintrust experiment metadata, LangSmith run tags), and
+            applies to all sources in the request. Useful when sources
+            disagree about which agent revision they captured.
+          example: git-sha-abc123
+
+    Source:
+      oneOf:
+        - $ref: '#/components/schemas/BraintrustSource'
+        - $ref: '#/components/schemas/LangSmithSource'
+        - $ref: '#/components/schemas/PostHogSource'
+      discriminator:
+        propertyName: type
+        mapping:
+          braintrust: '#/components/schemas/BraintrustSource'
+          langsmith: '#/components/schemas/LangSmithSource'
+          posthog: '#/components/schemas/PostHogSource'
+
+    BraintrustSource:
+      type: object
+      required: [type, experiment_id]
+      properties:
+        type:
+          type: string
+          enum: [braintrust]
+        experiment_id:
+          type: string
+          maxLength: 128
+          description: |
+            Braintrust experiment ID. Format is determined by Braintrust;
+            Pluma does not validate the shape beyond a length limit.
+          example: exp_abc123
+        primary_scorer:
+          type: string
+          maxLength: 64
+          description: |
+            Scorer name to use for identifying failing rows in this Braintrust
+            experiment. Falls back to the experiment's default scorer if not
+            set.
+          example: factuality
+
+    LangSmithSource:
+      type: object
+      required: [type, project_name]
+      properties:
+        type:
+          type: string
+          enum: [langsmith]
+        project_name:
+          type: string
+          maxLength: 128
+          description: |
+            LangSmith project name. Format is determined by LangSmith;
+            Pluma does not validate the shape beyond a length limit.
+          example: my-agent-prod
+        filter:
+          type: string
+          maxLength: 512
+          description: |
+            LangSmith filter DSL expression. See the LangSmith docs for full
+            syntax: https://docs.smith.langchain.com/observability/how_to_guides/filter_traces_in_application
+
+            Common patterns:
+
+            - `eq(feedback_key, "thumbs_down")` — failures flagged by user feedback
+            - `and(eq(status, "error"), gte(start_time, "2026-05-01"))` — errors in a time window
+            - `has(tags, "production")` — only production-tagged runs
+            - `lt(latency, 0.5)` — runs faster than 500ms
+          example: 'eq(feedback_key, "thumbs_down")'
+        workflow:
+          type: string
+          enum: [dataset_experiment, project_traced]
+          default: project_traced
+          description: |
+            Which LangSmith data shape to read. `dataset_experiment` reads
+            from a dataset-and-experiment pairing; `project_traced` reads
+            from production traces in a project.
+
+    PostHogSource:
+      type: object
+      required: [type, cohort_id]
+      properties:
+        type:
+          type: string
+          enum: [posthog]
+        cohort_id:
+          type: string
+          maxLength: 128
+          description: |
+            PostHog cohort or insight ID. Format is determined by PostHog;
+            Pluma does not validate the shape beyond a length limit.
+          example: cohort_456
+
+    Job:
+      type: object
+      required: [job_id, status, created_at, terminated_at, error]
+      properties:
+        job_id:
+          $ref: '#/components/schemas/JobId'
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        created_at:
+          type: string
+          format: date-time
+          description: RFC 3339 timestamp when the job was submitted.
+        terminated_at:
+          oneOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          description: |
+            RFC 3339 timestamp when the job reached any terminal status
+            (`completed`, `failed`, or `cancelled`). Null while the job is
+            `pending` or `running`.
+        error:
+          oneOf:
+            - $ref: '#/components/schemas/Error'
+            - type: 'null'
+          description: |
+            Error details if the job failed. Null for all other statuses
+            (`pending`, `running`, `completed`, `cancelled`).
+
+    JobStatus:
+      type: string
+      enum: [pending, running, completed, failed, cancelled]
+      description: |
+        Job lifecycle state:
+
+        - `pending`: queued but not yet started
+        - `running`: actively being processed
+        - `completed`: terminal — findings available via the findings sub-resource
+        - `failed`: terminal — see `error` field for details
+        - `cancelled`: terminal — cancelled via `DELETE /v1/jobs/{job_id}`
+
+    JobFindings:
+      type: object
+      required: [job_id, status, findings]
+      properties:
+        job_id:
+          $ref: '#/components/schemas/JobId'
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        findings:
+          $ref: '#/components/schemas/FailingEvalContainer'
+
+    FailingEvalContainer:
+      type: object
+      required: [version, evals]
+      description: |
+        Root container for diagnostic findings, conforming to
+        [agent-diagnosis-spec v0.2](https://github.com/ivaylogb/agent-diagnosis-spec).
+      properties:
+        version:
+          type: string
+          enum: ['0.2']
+          description: Schema version. Always `0.2` for this API.
+        evals:
+          type: array
+          description: One entry per diagnosed failing eval.
+          items:
+            $ref: '#/components/schemas/FailingEval'
+        agent_revision:
+          oneOf:
+            - type: string
+            - type: 'null'
+          description: |
+            Git SHA, version tag, or other revision identifier for the agent
+            that produced the failing evals. Null if no revision could be
+            resolved from sources or override.
+
+    FailingEval:
+      type: object
+      required: [eval_id, category, claim, applyable]
+      x-version-capability:
+        v0.1:
+          eval_id: populated
+          claim: short source-data summary
+          category: always measurement_instrument
+          citation: populated if source metadata has file:line, else null
+          applyable: always false
+          edit: always null
+        v0.2:
+          eval_id: populated
+          claim: full diagnostic claim
+          category: inferred from structural diagnosis
+          citation: populated by structural diagnosis when applicable
+          applyable: true when single-edit fix is produced
+          edit: populated when applyable is true
+      description: |
+        A failing eval surfaced by Pluma's diagnostic API.
+
+        Conforms to the diagnostic-findings shape defined in
+        [agent-diagnosis-spec v0.2](https://github.com/ivaylogb/agent-diagnosis-spec).
+        See the top-level "API v0.1 capability vs schema" section for which
+        fields are populated by v0.1 vs which arrive in v0.2.
+      properties:
+        eval_id:
+          type: string
+          description: |
+            Stable identifier for this eval, opaque to the API. Originates
+            from the source platform (Braintrust row ID, LangSmith run ID,
+            etc.).
+          example: braintrust:exp_abc123:row_xyz789
+        category:
+          type: string
+          enum: [measurement_instrument, interface, context_at_decision, call_sequence]
+          x-version-capability:
+            v0.1: always `measurement_instrument` (accurate — see description)
+            v0.2: inferred from structural diagnosis
+          description: |
+            Failure-mode category. One of:
+
+            - `measurement_instrument`: the eval/scorer itself is the
+              observation point (false positive, miscalibrated rubric, label
+              noise, or simply "this eval failed and we haven't diagnosed
+              deeper")
+            - `interface`: agent-tool boundary (broken tool description,
+              format mismatch, ambiguous error response)
+            - `context_at_decision`: missing or wrong context at the moment
+              the agent made the failing decision
+            - `call_sequence`: ordering or retry logic at the agent loop
+              level
+
+            **v0.1 behavior:** always `measurement_instrument`. This is
+            accurate, not a placeholder — v0.1 observes failing evals from
+            their measurement point without performing the deeper structural
+            diagnosis required to assign one of the other three categories.
+
+            **v0.2 behavior:** populated by structural diagnosis (unblocked
+            by upstream `agent-researcher` work to emit structured findings
+            directly).
+        claim:
+          type: string
+          description: |
+            Plain-English statement about this failing eval.
+
+            **v0.1:** short summary derived from source data (failing-row
+            count, score band, scorer name).
+
+            **v0.2:** full diagnostic claim from structural analysis.
+          example: |
+            1 failing row in Braintrust experiment exp_abc123, scorer
+            factuality below 0.5
+        citation:
+          oneOf:
+            - $ref: '#/components/schemas/Citation'
+            - type: 'null'
+          x-version-capability:
+            v0.1: populated when source span metadata contains `file:line`; null otherwise
+            v0.2: populated by structural diagnosis
+          description: |
+            `file:line` reference into the agent's source code where the
+            issue manifests.
+
+            **v0.1:** populated only when the source's span/trace metadata
+            already carries a `file:line` (Braintrust spans with code
+            location, LangSmith runs with source attribution). Null when
+            source data has no file:line metadata.
+
+            **v0.2:** populated by structural diagnosis when applicable.
+        applyable:
+          type: boolean
+          x-version-capability:
+            v0.1: always false
+            v0.2: true when a single-edit fix is produced
+          description: |
+            True if the API produced a single-edit fix that would resolve
+            this failing eval. False when the issue requires judgment or
+            multi-file changes that can't be expressed as a single edit.
+
+            **v0.1:** always `false`. v0.1 has no edit-proposal mechanism.
+
+            **v0.2:** `true` when structural diagnosis produces a single-edit
+            fix.
+        edit:
+          oneOf:
+            - $ref: '#/components/schemas/Edit'
+            - type: 'null'
+          x-version-capability:
+            v0.1: always null
+            v0.2: populated when applyable is true
+          description: |
+            Proposed single-edit fix. Non-null if and only if
+            `applyable == true`.
+
+            **v0.1:** always `null`.
+
+            **v0.2:** populated when `applyable == true`.
+
+    Citation:
+      type: object
+      required: [file, line]
+      description: A `file:line` reference into source code.
+      properties:
+        file:
+          type: string
+          description: Path relative to the repository root.
+          example: src/agent/tools/search_orders.py
+        line:
+          type: integer
+          minimum: 1
+          description: 1-indexed line number.
+          example: 42
+
+    Edit:
+      type: object
+      required: [path, before, after]
+      description: |
+        A single-file edit proposed as a fix.
+
+        ## Application semantics
+
+        The edit applies to the file at `path`. The location within the file
+        is determined by finding `before` as an exact character-for-character
+        match (including whitespace and line breaks). When applying:
+
+        1. Read the file at `path`.
+        2. Find `before` in the file content as an exact substring match.
+        3. If `before` does not appear in the file, the edit is rejected
+           (file has drifted since diagnosis).
+        4. If `before` appears more than once, the edit is rejected as
+           ambiguous. The applying tool should surface this and let a human
+           disambiguate.
+        5. Otherwise, replace the single occurrence of `before` with `after`
+           and write the file back.
+
+        The `before` field acts as a pre-image guard: applying the edit
+        requires the current file to match exactly. If it has drifted, the
+        edit is rejected rather than applied to wrong source.
+
+        The example below is illustrative and does not reference any real
+        package or codebase.
+      properties:
+        path:
+          type: string
+          description: Path to the file to edit, relative to the repository root.
+          example: src/agent/tools/example_tool.py
+        before:
+          type: string
+          description: |
+            Exact text that must currently exist in the file. Acts as a
+            pre-image guard against drift between diagnosis and application.
+          example: |
+            def example_tool(arg: str) -> Result:
+                """Process the input argument."""
+        after:
+          type: string
+          description: Replacement text. Empty string deletes the `before` block.
+          example: |
+            def example_tool(arg: int) -> Result:
+                """Process the input argument (numeric, e.g., 12345).
+
+                Do not pass a string — use `lookup_arg_by_name` first to
+                resolve to a numeric ID.
+                """
+
+    Error:
+      type: object
+      required: [code, message, request_id]
+      properties:
+        code:
+          type: string
+          description: |
+            Stable error code. Safe to programmatically dispatch on. Known
+            values: `bad_request`, `unauthorized`, `not_found`,
+            `validation_failed`, `job_not_complete`, `source_fetch_failed`,
+            `findings_expired`, `internal_error`.
+          example: source_fetch_failed
+        message:
+          type: string
+          description: Human-readable error message.
+          example: Braintrust API returned 404 for experiment exp_abc123
+        request_id:
+          type: string
+          pattern: '^req_[0-9A-HJKMNP-TV-Z]{24}$'
+          description: |
+            Unique identifier for the request that produced this error.
+            Matches the `X-Request-Id` response header. Include this value
+            when reporting issues.
+          example: req_B7T7N835B1AX6A795C0TWB1E
+        details:
+          type: object
+          additionalProperties: true
+          description: |
+            Optional structured context. Field names depend on the error code:
+
+            - `validation_failed` includes `field` (the offending request path)
+              and `error` (the validation rule that failed)
+            - `source_fetch_failed` includes `source_type` and a
+              source-specific identifier (`experiment_id`, `project_name`, etc.)
+            - `not_found` includes the missing identifier (`job_id`, etc.)
+            - `job_not_complete` includes `job_id` and `current_status`
+
+  responses:
+    BadRequest:
+      description: Request was malformed.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: bad_request
+            message: Request body is not valid JSON
+            request_id: req_B7T7N835B1AX6A795C0TWB1E
+    Unauthorized:
+      description: Missing or invalid API key.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: unauthorized
+            message: Missing or invalid X-Pluma-Key header
+            request_id: req_B7T7N835B1AX6A795C0TWB1E
+    NotFound:
+      description: Resource not found.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: not_found
+            message: No job with id job_01HPCZ5VB5AQ8H21W2T5EZYP
+            request_id: req_B7T7N835B1AX6A795C0TWB1E
+            details:
+              job_id: job_01HPCZ5VB5AQ8H21W2T5EZYP
+    ValidationError:
+      description: Request body failed schema validation.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: validation_failed
+            message: Request body failed schema validation
+            request_id: req_B7T7N835B1AX6A795C0TWB1E
+            details:
+              field: sources[0].experiment_id
+              error: required field missing
+    InternalError:
+      description: |
+        An unexpected server error occurred. The `code` field will be
+        `internal_error`. Retry with exponential backoff; if the error
+        persists, report the `request_id`.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: internal_error
+            message: An unexpected error occurred. Please report request_id req_B7T7N835B1AX6A795C0TWB1E.
+            request_id: req_B7T7N835B1AX6A795C0TWB1E
